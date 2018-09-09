@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="iOS,Swift," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="感慨刚刚经历完毕业季，终于能有点空余时间来弄弄自己的博客了~之前一直面试找工作，弄毕设(iOS端和后台都是用Swift写的 项目地址)，写论文，和同学道别😭。。。">
+<meta name="keywords" content="iOS,Swift">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Swift面向协议和Codable的网络层设计">
+<meta property="og:url" content="http://yoursite.com/2018/07/02/Swift中Codable网络层设计/index.html">
+<meta property="og:site_name" content="Tanner Jin">
+<meta property="og:description" content="感慨刚刚经历完毕业季，终于能有点空余时间来弄弄自己的博客了~之前一直面试找工作，弄毕设(iOS端和后台都是用Swift写的 项目地址)，写论文，和同学道别😭。。。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/images/codable%20error.png">
+<meta property="og:updated_time" content="2018-07-13T07:09:54.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Swift面向协议和Codable的网络层设计">
+<meta name="twitter:description" content="感慨刚刚经历完毕业季，终于能有点空余时间来弄弄自己的博客了~之前一直面试找工作，弄毕设(iOS端和后台都是用Swift写的 项目地址)，写论文，和同学道别😭。。。">
+<meta name="twitter:image" content="http://yoursite.com/images/codable%20error.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/07/02/Swift中Codable网络层设计/"/>
+
+
+
+
+
+  <title>Swift面向协议和Codable的网络层设计 | Tanner Jin</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Tanner Jin</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/02/Swift中Codable网络层设计/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Tanner Jin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tanner Jin">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Swift面向协议和Codable的网络层设计</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-02T16:15:10+08:00">
+                2018-07-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="感慨"><a href="#感慨" class="headerlink" title="感慨"></a>感慨</h3><p>刚刚经历完毕业季，终于能有点空余时间来弄弄自己的博客了~<br>之前一直面试找工作，弄毕设(iOS端和后台都是用Swift写的 <a href="https://github.com/Jintao1997/GraduationProject-iOS" target="_blank" rel="noopener">项目地址</a>)，写论文，和同学道别😭。。。<br><a id="more"></a></p>
+<h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>Codable是Swift4中新引入的一个协议。我一开始了解到这个协议是看了王巍的这篇博客<a href="https://onevcat.com/2018/03/swift-meta/" target="_blank" rel="noopener">不同角度看问题 - 从 Codable 到 Swift 元编程</a>  当然，🐱神的这篇博客主要讲的是Mirror(映射对象的属性)</p>
+<h3 id="Codabel概念与使用"><a href="#Codabel概念与使用" class="headerlink" title="Codabel概念与使用"></a>Codabel概念与使用</h3><p>Codable是一个编码(Encoding)和解码(Decoding)的协议。类或者结构体遵循该协议，能让数据自动解码并生成该对象的实例，前提是该对象的属性都遵循Codable协议(常见有的String，Int，Double，Date，Data，URL)，如果属性是Array或者Dictionary等集合类型，则必须保证集合类型中的元素都遵循Codable协议，像Dictionary&lt; String, Any&gt;类型中的Any就不遵循Codable协议，当然后面我会讲如何尽量在开发中避免该情况。  </p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> jsonStr = <span class="string">"&#123;\"token\":\"fjawicnwgqybcgysd\",\"student_number\":14104405,\"student_name\":\"Tanner Jin\",\"age\":21, \"teachers\":[&#123;\"name\":\"Wang\", \"age\":39&#125;, &#123;\"name\":\"Wu\", \"age\":42&#125;]&#125;"</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Teacher</span>: <span class="title">Codable</span> </span>&#123;</span><br><span class="line">	<span class="keyword">var</span> name: <span class="type">String</span></span><br><span class="line">	<span class="keyword">var</span> age: <span class="type">Int</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Student</span>: <span class="title">Codable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">var</span> token: <span class="type">String</span></span><br><span class="line">	<span class="keyword">var</span> name: <span class="type">String</span></span><br><span class="line">	<span class="keyword">var</span> age: <span class="type">Int</span></span><br><span class="line">	<span class="keyword">var</span> teachers: <span class="type">Array</span>&lt;<span class="type">Teacher</span>&gt;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 如果JSON中没有该字段，要将该属性设为Optional类型, 否则解析失败</span></span><br><span class="line">	<span class="keyword">var</span> address: <span class="type">String</span>?</span><br><span class="line">	</span><br><span class="line">	<span class="class"><span class="keyword">enum</span> <span class="title">CodingKeys</span>: <span class="title">String</span>, <span class="title">CodingKey</span> </span>&#123;</span><br><span class="line">		<span class="keyword">case</span> token</span><br><span class="line">		<span class="keyword">case</span> age</span><br><span class="line">		<span class="keyword">case</span> teachers</span><br><span class="line">		<span class="keyword">case</span> address</span><br><span class="line">		<span class="keyword">case</span> name = <span class="string">"student_name"</span>  <span class="comment">// 用于JSON中字段和属性绑定</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> <span class="keyword">let</span> data = jsonStr.data(using: .utf8) &#123;</span><br><span class="line">	<span class="keyword">do</span> &#123;</span><br><span class="line">		<span class="keyword">let</span> student = <span class="keyword">try</span> <span class="type">JSONDecoder</span>().decode(<span class="type">Student</span>.<span class="keyword">self</span>, from: data)</span><br><span class="line">		<span class="built_in">print</span>(student.teachers[<span class="number">0</span>].name)</span><br><span class="line">	&#125; <span class="keyword">catch</span> &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="网络层的设计"><a href="#网络层的设计" class="headerlink" title="网络层的设计"></a>网络层的设计</h3><p>之前实习的时候接触过一个项目(当然原项目是Objective-C写的，我进入项目组后，强行弄成和Swift混编的项目，走过不少的坑，也坑了不少人😂)<br>原项目的的网络层主要是3层，最基本的一层是一个单例，基于AFN的AFHTTPSessionManager封装的一层网络请求(这一层是对项目无依赖的，单独拿出来放到哪个项目中都能用)。 第二层主要是基于项目的特性对Request和Response的设置统一设置，调用的是第一层的接口。第三层就是调用第二层的请求方法，然后每个接口写一个类方法(最后改类有500多行，还没加上分类的200多行的接口)，然后在Controller中调用第三层的类方法实现业务。。。<br>由于之前没接触过其他大的项目，后面在自己的Swift项目中也借鉴了这种网络层的设计。<br>最近接触到另外一种更符合Swift的设计，就是今天的主题了~      </p>
+<h4 id="1-模型协议-CodableProtocol"><a href="#1-模型协议-CodableProtocol" class="headerlink" title="1. 模型协议(CodableProtocol)"></a>1. 模型协议(CodableProtocol)</h4><p>简单的封装了一下Codable协议，能够实现字典，JSONString，Data和模型的相互装换。<br><a href="https://github.com/Jintao1997/GraduationProject-iOS/blob/master/Mojave/Mojave/Tool/NetWork/Manager/Codable.swift" target="_blank" rel="noopener">代码地址</a><br>(如果转化失败，可以查看抛出的错误)<br><img src="\images\codable error.png" alt=""></p>
+<h4 id="2-请求协议-RequestProtocol"><a href="#2-请求协议-RequestProtocol" class="headerlink" title="2. 请求协议(RequestProtocol)"></a>2. 请求协议(RequestProtocol)</h4><p>由于协议能定义关联对象，因此可以定义一个RequestProtol协议，关联一个遵循Codable协议的对象(作为模型)。至此，一个接口对应一个请求，一个请求对应一个模型 </p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Alamofire</span><br><span class="line"><span class="class"><span class="keyword">protocol</span> <span class="title">RequestProtocol</span> </span>&#123;   </span><br><span class="line">	associatedtype modelType: <span class="type">CodableProtocol</span>        <span class="comment">// 模型</span></span><br><span class="line">	<span class="keyword">var</span> url: <span class="type">String</span> &#123;<span class="keyword">get</span>&#125;  			                   <span class="comment">// 接口</span></span><br><span class="line">	<span class="keyword">var</span> params: <span class="type">Dictionary</span> &#123;<span class="keyword">get</span> <span class="keyword">set</span>&#125;                 <span class="comment">// 参数</span></span><br><span class="line">	<span class="keyword">var</span> methon: <span class="type">HTTPHeaders</span> &#123;<span class="keyword">get</span>&#125;                    <span class="comment">// 请求方法</span></span><br><span class="line">	<span class="keyword">var</span> encoding: <span class="type">ParameterEncoding</span> &#123;<span class="keyword">get</span>&#125;            <span class="comment">// 数据编码</span></span><br><span class="line">	</span><br><span class="line">	...(根据需求自己定义)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="3-配合封装网络请求方法"><a href="#3-配合封装网络请求方法" class="headerlink" title="3. 配合封装网络请求方法"></a>3. 配合封装网络请求方法</h4><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 这里配合Alamofire以及SwiftyJSON使用</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">requestData</span>&lt;T: RequestProtocol&gt;<span class="params">(request: T, sucess: <span class="params">(<span class="number">_</span> model: T.modelType)</span></span></span>-&gt;<span class="type">Void</span>, failure: (<span class="number">_</span> error: <span class="type">Error</span>)-&gt;<span class="type">Void</span>) </span><br><span class="line">&#123;	</span><br><span class="line">	<span class="type">Alamofire</span>.request(request.url, method: request.methon, parameters: request.params, encoding: request.encoding, headers: request.header).validate().responseJSON &#123; (result) <span class="keyword">in</span></span><br><span class="line">            </span><br><span class="line">    	<span class="keyword">switch</span> result.result &#123;</span><br><span class="line">            <span class="keyword">case</span> .success(<span class="keyword">let</span> value):</span><br><span class="line">                <span class="keyword">let</span> jsonValue = <span class="type">JSON</span>(value)</span><br><span class="line">                <span class="keyword">do</span> &#123;</span><br><span class="line">                    <span class="comment">// 该方法是CodableProtocol中封装好的方法</span></span><br><span class="line">                    <span class="keyword">let</span> model = <span class="keyword">try</span> <span class="type">T</span>.modelType.initialization(jsonValue)</span><br><span class="line">                    sucess(model)</span><br><span class="line">                &#125; <span class="keyword">catch</span> &#123;</span><br><span class="line">                    failure(error)</span><br><span class="line">                &#125;</span><br><span class="line">                </span><br><span class="line">            <span class="keyword">case</span> .failure(<span class="keyword">let</span> error):</span><br><span class="line">                failure(error)</span><br><span class="line">                </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="4-具体使用例子"><a href="#4-具体使用例子" class="headerlink" title="4. 具体使用例子"></a>4. 具体使用例子</h4><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">studentRequest</span>: <span class="title">RequestProtocol</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Student为上面列子的模型，当然遵循的是自定义的CodableProtocol协议</span></span><br><span class="line">	<span class="keyword">typealias</span> modelType = <span class="type">Student</span> </span><br><span class="line">	</span><br><span class="line">	<span class="keyword">var</span> url: <span class="type">String</span> = <span class="string">"http://..."</span>  		</span><br><span class="line">	<span class="keyword">var</span> params: <span class="type">Dictionary</span>&lt;<span class="type">String</span>, <span class="type">Any</span>&gt; = [:]                  </span><br><span class="line">	<span class="keyword">var</span> methon: <span class="type">HTTPHeaders</span> = .<span class="keyword">get</span>                    </span><br><span class="line">	<span class="keyword">var</span> encoding: <span class="type">ParameterEncoding</span> = <span class="type">JSONEncoding</span>.<span class="keyword">default</span> </span><br><span class="line">	</span><br><span class="line">	<span class="keyword">init</span>(...) &#123;...&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 具体请求</span></span><br><span class="line"><span class="keyword">let</span> testRequest = studentRequest(...)</span><br><span class="line"></span><br><span class="line">requestData(request: testRequest, sucess: &#123; (model) <span class="keyword">in</span></span><br><span class="line"></span><br><span class="line">	<span class="built_in">print</span>(model.teachers[<span class="number">0</span>].name)	</span><br><span class="line">&#125;, failure: &#123; (error)</span><br><span class="line">	<span class="built_in">print</span>(error)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<h4 id="5-如何避免模型中的Any等不遵循Codable协议的类型"><a href="#5-如何避免模型中的Any等不遵循Codable协议的类型" class="headerlink" title="5. 如何避免模型中的Any等不遵循Codable协议的类型"></a>5. 如何避免模型中的Any等不遵循Codable协议的类型</h4><p>目前我的解决方法是在使用模型的这层(可能是Controller，也可能是ViewModel)中再建立一个中间层ModelHandle(数据处理加工层)，即遵循CodableProtocol协议的模型是瘦模型，该模型的属性只存网络请求下来后的有用的数据。然后在ModelHandle中对模型进行处理加工，添加一些Controller或者ViewModel需要的但不遵循Codable协议的一些属性。然后在Controller或者ViewModel中使用数据加工层。</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">StudentModelHandle</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">var</span> model: <span class="type">Student</span></span><br><span class="line">	<span class="keyword">var</span> viewData: <span class="type">Dictionary</span>&lt;<span class="type">String</span>, <span class="type">Any</span>&gt;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 将Student的address属性提出来(如果后台返回的JOSN一定没有该字段的情况下)</span></span><br><span class="line">	<span class="keyword">var</span> address: <span class="type">String</span></span><br><span class="line">	</span><br><span class="line">	<span class="keyword">init</span>() &#123;</span><br><span class="line">		handelModel() </span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">private</span> <span class="function"><span class="keyword">func</span> <span class="title">handleModel</span><span class="params">()</span></span> &#123;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
+          
+            <a href="/tags/Swift/" rel="tag"># Swift</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/09/09/iOS逆向学习笔记/" rel="prev" title="iOS逆向学习笔记">
+                iOS逆向学习笔记 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="Tanner Jin" />
+            
+              <p class="site-author-name" itemprop="name">Tanner Jin</p>
+              <p class="site-description motion-element" itemprop="description">尘世间一迷途小码农</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/Jintao1997" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/p/1005055237152442/home?from=page_100505&mod=TAB&is_hot=1#place" target="_blank" title="Weibo">
+                      
+                        <i class="fa fa-fw fa-Weibo"></i>Weibo</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#感慨"><span class="nav-number">1.</span> <span class="nav-text">感慨</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#正文"><span class="nav-number"></span> <span class="nav-text">正文</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Codabel概念与使用"><span class="nav-number">2.</span> <span class="nav-text">Codabel概念与使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#网络层的设计"><span class="nav-number">3.</span> <span class="nav-text">网络层的设计</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-模型协议-CodableProtocol"><span class="nav-number">3.1.</span> <span class="nav-text">1. 模型协议(CodableProtocol)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-请求协议-RequestProtocol"><span class="nav-number">3.2.</span> <span class="nav-text">2. 请求协议(RequestProtocol)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-配合封装网络请求方法"><span class="nav-number">3.3.</span> <span class="nav-text">3. 配合封装网络请求方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-具体使用例子"><span class="nav-number">3.4.</span> <span class="nav-text">4. 具体使用例子</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-如何避免模型中的Any等不遵循Codable协议的类型"><span class="nav-number">3.5.</span> <span class="nav-text">5. 如何避免模型中的Any等不遵循Codable协议的类型</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tanner Jin</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
