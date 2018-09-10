@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="Tanner Jin">
 <meta property="og:description" content="iOS逆向学习笔记最近买了庆总的《iOS应用逆向与安全》，学习过程中，记录下自己的总结，以后忘了好方便来查。。。（强烈建议买一本回去读，能够系统性的学习逆向方面的知识。如果基础不够可以再买一本狗神的小黄书《iOS应用逆向工程》） 逆向了解通过越狱获取手机的root权限后，访问整个手机的文件系统，编写动态库注入到指定的应用中。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-09-09T05:04:58.919Z">
+<meta property="og:updated_time" content="2018-09-10T07:09:11.300Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iOS逆向学习笔记">
 <meta name="twitter:description" content="iOS逆向学习笔记最近买了庆总的《iOS应用逆向与安全》，学习过程中，记录下自己的总结，以后忘了好方便来查。。。（强烈建议买一本回去读，能够系统性的学习逆向方面的知识。如果基础不够可以再买一本狗神的小黄书《iOS应用逆向工程》） 逆向了解通过越狱获取手机的root权限后，访问整个手机的文件系统，编写动态库注入到指定的应用中。">
@@ -345,6 +345,7 @@
         <h2 id="iOS逆向学习笔记"><a href="#iOS逆向学习笔记" class="headerlink" title="iOS逆向学习笔记"></a>iOS逆向学习笔记</h2><p>最近买了庆总的<a href="https://detail.tmall.com/item.htm?id=570691214072" target="_blank" rel="noopener">《iOS应用逆向与安全》</a>，学习过程中，记录下自己的总结，以后忘了好方便来查。。。（强烈建议买一本回去读，能够系统性的学习逆向方面的知识。如果基础不够可以再买一本狗神的小黄书<a href="https://item.jd.com/11670145.html" target="_blank" rel="noopener">《iOS应用逆向工程》</a>）</p>
 <h3 id="逆向了解"><a href="#逆向了解" class="headerlink" title="逆向了解"></a>逆向了解</h3><p>通过越狱获取手机的root权限后，访问整个手机的文件系统，编写动态库注入到指定的应用中。</p>
 <a id="more"></a>
+<h3 id="基础了解"><a href="#基础了解" class="headerlink" title="基础了解"></a>基础了解</h3><p>通过Mac端的iFunBox了解iPhone的文件系统(或者iPhone的越狱商店的iFile)</p>
 <h3 id="逆向流程-自己通过学习实践总结的，可能会有遗漏。。。"><a href="#逆向流程-自己通过学习实践总结的，可能会有遗漏。。。" class="headerlink" title="逆向流程(自己通过学习实践总结的，可能会有遗漏。。。)"></a>逆向流程(自己通过学习实践总结的，可能会有遗漏。。。)</h3><ol>
 <li>reveal静态分析界面, Cycript动态分析界面</li>
 <li>获取应用安装包，解密应用，class-dump出头文件</li>
@@ -353,7 +354,7 @@
 <li>通过lldb以及上个步骤获取到函数的文件偏移地址，对APP进行动态调试，打印函数参数等信息</li>
 <li>根据4和5来分析函数后，想好如何修改函数逻辑。</li>
 <li>通过Theos编写hook代码，打包成dylib动态库。</li>
-<li>(越狱)将动态库直接安装到越狱手机中</li>
+<li>(越狱)将动态库直接安装到越狱手机中(通过DYLD_INSERT_LIBRAPIES配置环境变量)</li>
 <li>(非越狱)修改APP二进制的Load Commands，将7打包好的动态库放入到APP安装包中，对APP二进制以及APP中的动态库进行重签名后，安装到非越狱手机中</li>
 </ol>
 
@@ -396,8 +397,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2018/09/09/iOS逆向学习笔记-界面分析/" rel="prev" title="iOS逆向学习笔记 界面分析">
-                iOS逆向学习笔记 界面分析 <i class="fa fa-chevron-right"></i>
+              <a href="/2018/09/09/iOS逆向学习笔记-一-界面分析/" rel="prev" title="iOS逆向学习笔记(一) 界面分析">
+                iOS逆向学习笔记(一) 界面分析 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -479,7 +480,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-count">4</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -550,7 +551,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#iOS逆向学习笔记"><span class="nav-number">1.</span> <span class="nav-text">iOS逆向学习笔记</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#逆向了解"><span class="nav-number">1.1.</span> <span class="nav-text">逆向了解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#逆向流程-自己通过学习实践总结的，可能会有遗漏。。。"><span class="nav-number">1.2.</span> <span class="nav-text">逆向流程(自己通过学习实践总结的，可能会有遗漏。。。)</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#iOS逆向学习笔记"><span class="nav-number">1.</span> <span class="nav-text">iOS逆向学习笔记</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#逆向了解"><span class="nav-number">1.1.</span> <span class="nav-text">逆向了解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#基础了解"><span class="nav-number">1.2.</span> <span class="nav-text">基础了解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#逆向流程-自己通过学习实践总结的，可能会有遗漏。。。"><span class="nav-number">1.3.</span> <span class="nav-text">逆向流程(自己通过学习实践总结的，可能会有遗漏。。。)</span></a></li></ol></li></ol></div>
             
 
           </div>
