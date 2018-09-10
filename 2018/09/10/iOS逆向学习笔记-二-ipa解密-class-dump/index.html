@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="Tanner Jin">
 <meta property="og:description" content="ipa解密">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-09-10T10:14:40.826Z">
+<meta property="og:updated_time" content="2018-09-10T13:14:53.442Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iOS逆向学习笔记(二) ipa解密,class-dump">
 <meta name="twitter:description" content="ipa解密">
@@ -349,12 +349,12 @@
 <ul>
 <li>make: git clone后在当前文件中执行make指令，会将源码编译生成一个dumpdecrypted.dylib动态库。通过该动态库进行解密APP的二进制文件。   </li>
 <li><p>主要命令：     </p>
-<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">DYLD_INSERT_LIBRAPIES</span>=dumpdecrypted.dylib executableFile</span><br></pre></td></tr></table></figure>
-<p>DYLD_INSERT_LIBRAPIES是一个环境变量，可以让executableFile在启动时，在dyld加载动态库时，通过DYLD_INSERT_LIBRAPIES环境变量来加载指定的动态库(dumpdecrypted.dylib),即可达到运行时解密目的~   </p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">DYLD_INSERT_LIBRARIES</span>=dumpdecrypted.dylib executableFile</span><br></pre></td></tr></table></figure>
+<p>DYLD_INSERT_LIBRARIES是一个环境变量，可以让executableFile在启动时，在dyld加载动态库时，通过DYLD_INSERT_LIBRARIES环境变量来加载指定的动态库(dumpdecrypted.dylib),即可达到运行时解密目的~   </p>
 </li>
 <li><p>具体操作：<br>(1) 将dumpdecrypted.dylib复制到手机中，书上建议复制到APP的沙盒目录的Document目录下。(我试了下放到APP可执行文件同目录下也可以，不过在解密后，生成的解密文件也是在沙盒目录的Document目录下，且dumpdecrypted.dylib也会在Document目录下被复制一份) </p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 复制到手机命令(也可以通过工具iFunBox)    </span><br><span class="line">scp -P 2222 root@localhost:/.../Document /.../dumpdecrypted.dylib</span><br></pre></td></tr></table></figure>
-<p>(2) 在Document目录下执行DYLD_INSERT_LIBRAPIES=dumpdecrypted.dylib executableFile命令得到APP.decrypted文件。<br>(3) 将APP.decrypted文件拷贝到电脑中，命令参考第一步</p>
+<p>(2) 在Document目录下执行DYLD_INSERT_LIBRARIES=dumpdecrypted.dylib executableFile命令得到APP.decrypted文件。<br>(3) 将APP.decrypted文件拷贝到电脑中，命令参考第一步</p>
 </li>
 </ul>
 </li>
