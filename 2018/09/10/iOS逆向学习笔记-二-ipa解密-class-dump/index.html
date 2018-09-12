@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="ipa解密">
+<meta name="description" content="通过class-dump可以获取到App的头文件，而头文件又有一些属性以及方法等信息，通过这些信息以及界面调试能够大致猜出目的函数的位置。但是由于苹果商店的APP的代码被加密过，在运行时才会解密，因此需要将可执行文件先进行解密。">
 <meta name="keywords" content="iOS逆向,iOS逆向学习笔记">
 <meta property="og:type" content="article">
-<meta property="og:title" content="iOS逆向学习笔记(二) ipa解密,class-dump">
+<meta property="og:title" content="iOS逆向学习笔记(二) App解密与class-dump">
 <meta property="og:url" content="http://yoursite.com/2018/09/10/iOS逆向学习笔记-二-ipa解密-class-dump/index.html">
 <meta property="og:site_name" content="Tanner Jin">
-<meta property="og:description" content="ipa解密">
+<meta property="og:description" content="通过class-dump可以获取到App的头文件，而头文件又有一些属性以及方法等信息，通过这些信息以及界面调试能够大致猜出目的函数的位置。但是由于苹果商店的APP的代码被加密过，在运行时才会解密，因此需要将可执行文件先进行解密。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-09-10T13:25:53.457Z">
+<meta property="og:updated_time" content="2018-09-12T08:20:09.811Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="iOS逆向学习笔记(二) ipa解密,class-dump">
-<meta name="twitter:description" content="ipa解密">
+<meta name="twitter:title" content="iOS逆向学习笔记(二) App解密与class-dump">
+<meta name="twitter:description" content="通过class-dump可以获取到App的头文件，而头文件又有一些属性以及方法等信息，通过这些信息以及界面调试能够大致猜出目的函数的位置。但是由于苹果商店的APP的代码被加密过，在运行时才会解密，因此需要将可执行文件先进行解密。">
 
 
 
@@ -126,7 +126,7 @@
 
 
 
-  <title>iOS逆向学习笔记(二) ipa解密,class-dump | Tanner Jin</title>
+  <title>iOS逆向学习笔记(二) App解密与class-dump | Tanner Jin</title>
   
 
 
@@ -270,7 +270,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">iOS逆向学习笔记(二) ipa解密,class-dump</h1>
+          <h1 class="post-title" itemprop="name headline">iOS逆向学习笔记(二) App解密与class-dump</h1>
         
 
         <div class="post-meta">
@@ -342,8 +342,8 @@
       
 
       
-        <h2 id="ipa解密"><a href="#ipa解密" class="headerlink" title="ipa解密"></a>ipa解密</h2><a id="more"></a> 
-<p>为什么要解密，请看书~   </p>
+        <p>通过class-dump可以获取到App的头文件，而头文件又有一些属性以及方法等信息，通过这些信息以及界面调试能够大致猜出目的函数的位置。但是由于苹果商店的APP的代码被加密过，在运行时才会解密，因此需要将可执行文件先进行解密。<br><a id="more"></a> </p>
+<h2 id="App解密"><a href="#App解密" class="headerlink" title="App解密"></a>App解密</h2><p>解密目的：   </p>
 <ol>
 <li><p>通过<a href="https://github.com/stefanesser/dumpdecrypted" target="_blank" rel="noopener">dumpdecrypted</a>解密   </p>
 <ul>
@@ -567,7 +567,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ipa解密"><span class="nav-number">1.</span> <span class="nav-text">ipa解密</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#class-dump"><span class="nav-number">2.</span> <span class="nav-text">class-dump</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#App解密"><span class="nav-number">1.</span> <span class="nav-text">App解密</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#class-dump"><span class="nav-number">2.</span> <span class="nav-text">class-dump</span></a></li></ol></div>
             
 
           </div>
