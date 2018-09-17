@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="Tanner Jin">
 <meta property="og:description" content="通过class-dump可以获取到App的头文件，而头文件又有一些属性以及方法等信息，通过这些信息以及界面调试能够大致猜出目的函数的位置。但是由于苹果商店的APP的代码被加密过，在运行时才会解密，因此需要将可执行文件先进行解密。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-09-12T08:20:09.811Z">
+<meta property="og:updated_time" content="2018-09-12T08:30:51.403Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iOS逆向学习笔记(二) App解密与class-dump">
 <meta name="twitter:description" content="通过class-dump可以获取到App的头文件，而头文件又有一些属性以及方法等信息，通过这些信息以及界面调试能够大致猜出目的函数的位置。但是由于苹果商店的APP的代码被加密过，在运行时才会解密，因此需要将可执行文件先进行解密。">
@@ -343,8 +343,7 @@
 
       
         <p>通过class-dump可以获取到App的头文件，而头文件又有一些属性以及方法等信息，通过这些信息以及界面调试能够大致猜出目的函数的位置。但是由于苹果商店的APP的代码被加密过，在运行时才会解密，因此需要将可执行文件先进行解密。<br><a id="more"></a> </p>
-<h2 id="App解密"><a href="#App解密" class="headerlink" title="App解密"></a>App解密</h2><p>解密目的：   </p>
-<ol>
+<h2 id="App解密"><a href="#App解密" class="headerlink" title="App解密"></a>App解密</h2><ol>
 <li><p>通过<a href="https://github.com/stefanesser/dumpdecrypted" target="_blank" rel="noopener">dumpdecrypted</a>解密   </p>
 <ul>
 <li>make: git clone后在当前文件中执行make指令，会将源码编译生成一个dumpdecrypted.dylib动态库。通过该动态库进行解密APP的二进制文件。   </li>
@@ -416,6 +415,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/09/12/iOS逆向学习笔记-三-静态分析/" rel="prev" title="iOS逆向学习笔记(三) 静态分析">
+                iOS逆向学习笔记(三) 静态分析 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -496,7 +499,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-count">5</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
