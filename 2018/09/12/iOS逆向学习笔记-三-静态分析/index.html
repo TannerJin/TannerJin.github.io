@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="通过界面分析调试以及class-dump出的头文件信息。后面说到Theos时，还可以通过Theos的logify.pl(logify.pl file.h &amp;gt;xxx.xm)对整个类的所有方法进行hook，动态调试时可以打印hook的函数调用的信息。通过以上三种方法大致能定位函数的具体位置，但是如何分析该函数的具体逻辑呢？">
+<meta name="description" content="通过界面分析调试以及class-dump出的头文件信息。后面说到Theos时，还可以通过Theos的logify.pl(logify.pl file.h &amp;gt;xxx.xm)对整个类的所有方法进行hook，动态调试时可以打印hook的函数调用的信息或者通过Mac自带的控制台可以查看被hook的方法的调用信息~通过以上三种方法大致能定位函数的具体位置，但是如何分析该函数的具体逻辑呢？">
 <meta name="keywords" content="iOS逆向,iOS逆向学习笔记">
 <meta property="og:type" content="article">
 <meta property="og:title" content="iOS逆向学习笔记(三) 静态分析">
 <meta property="og:url" content="http://yoursite.com/2018/09/12/iOS逆向学习笔记-三-静态分析/index.html">
 <meta property="og:site_name" content="Tanner Jin">
-<meta property="og:description" content="通过界面分析调试以及class-dump出的头文件信息。后面说到Theos时，还可以通过Theos的logify.pl(logify.pl file.h &amp;gt;xxx.xm)对整个类的所有方法进行hook，动态调试时可以打印hook的函数调用的信息。通过以上三种方法大致能定位函数的具体位置，但是如何分析该函数的具体逻辑呢？">
+<meta property="og:description" content="通过界面分析调试以及class-dump出的头文件信息。后面说到Theos时，还可以通过Theos的logify.pl(logify.pl file.h &amp;gt;xxx.xm)对整个类的所有方法进行hook，动态调试时可以打印hook的函数调用的信息或者通过Mac自带的控制台可以查看被hook的方法的调用信息~通过以上三种方法大致能定位函数的具体位置，但是如何分析该函数的具体逻辑呢？">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-09-12T09:45:45.211Z">
+<meta property="og:updated_time" content="2018-09-19T06:13:12.069Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iOS逆向学习笔记(三) 静态分析">
-<meta name="twitter:description" content="通过界面分析调试以及class-dump出的头文件信息。后面说到Theos时，还可以通过Theos的logify.pl(logify.pl file.h &amp;gt;xxx.xm)对整个类的所有方法进行hook，动态调试时可以打印hook的函数调用的信息。通过以上三种方法大致能定位函数的具体位置，但是如何分析该函数的具体逻辑呢？">
+<meta name="twitter:description" content="通过界面分析调试以及class-dump出的头文件信息。后面说到Theos时，还可以通过Theos的logify.pl(logify.pl file.h &amp;gt;xxx.xm)对整个类的所有方法进行hook，动态调试时可以打印hook的函数调用的信息或者通过Mac自带的控制台可以查看被hook的方法的调用信息~通过以上三种方法大致能定位函数的具体位置，但是如何分析该函数的具体逻辑呢？">
 
 
 
@@ -342,7 +342,7 @@
       
 
       
-        <p>通过界面分析调试以及class-dump出的头文件信息。后面说到Theos时，还可以通过Theos的logify.pl(logify.pl file.h &gt;xxx.xm)对整个类的所有方法进行hook，动态调试时可以打印hook的函数调用的信息。<br>通过以上三种方法大致能定位函数的具体位置，但是如何分析该函数的具体逻辑呢？<br><a id="more"></a><br>可以通过IDA以及Hopper这类的反汇编软件来分析反汇编代码以及汇编指令~</p>
+        <p>通过界面分析调试以及class-dump出的头文件信息。后面说到Theos时，还可以通过Theos的logify.pl(logify.pl file.h &gt;xxx.xm)对整个类的所有方法进行hook，动态调试时可以打印hook的函数调用的信息或者通过Mac自带的控制台可以查看被hook的方法的调用信息~<br>通过以上三种方法大致能定位函数的具体位置，但是如何分析该函数的具体逻辑呢？<br><a id="more"></a><br>可以通过IDA以及Hopper这类的反汇编软件来分析反汇编代码以及汇编指令~</p>
 
       
     </div>
@@ -384,6 +384,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/09/19/iOS安全-反调试/" rel="prev" title="iOS安全-反调试(Swift)">
+                iOS安全-反调试(Swift) <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -455,7 +459,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-count">6</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -477,7 +481,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-count">5</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
