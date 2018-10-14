@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="Tanner Jin">
 <meta property="og:description" content="最近开始研究代码混淆这反面的东西，发现混淆最好的地方是在编译过程中。这样不会影响正常的业务开发，对源码无侵害。顾开始学习LLVM，当然主要学习的是LLVM的Pass层。对LLVM不太清楚的可以看看关于LLVM，这些东西你必须知道！">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-10-14T05:03:57.236Z">
+<meta property="og:updated_time" content="2018-10-14T05:10:42.591Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="LLVM学习笔记-Clang和SwiftC常用指令使用">
 <meta name="twitter:description" content="最近开始研究代码混淆这反面的东西，发现混淆最好的地方是在编译过程中。这样不会影响正常的业务开发，对源码无侵害。顾开始学习LLVM，当然主要学习的是LLVM的Pass层。对LLVM不太清楚的可以看看关于LLVM，这些东西你必须知道！">
@@ -374,14 +374,31 @@
 <ul>
 <li>源代码生成可执行文件</li>
 </ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">clang main.c -o main</span><br><span class="line">```  </span><br><span class="line"></span><br><span class="line">* 目标文件生成可执行文件</span><br></pre></td></tr></table></figure>
-<p>clang main.o -o main<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line">### Swiftc指令(编译Swift文件)</span><br><span class="line"></span><br><span class="line">* 生成语法数</span><br></pre></td></tr></table></figure></p>
-<p>swiftc -dump-ast main.swift<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">* 生成Swift IL(SIL)</span><br></pre></td></tr></table></figure></p>
-<p>swiftc -emit-sil main.swift<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">* 生成LLVM IR</span><br></pre></td></tr></table></figure></p>
-<p>swiftc -emit-ir main.swift （-o main.ll 生成IR文件）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">* 生成汇编</span><br></pre></td></tr></table></figure></p>
-<p>swiftc -emit-assembly main.swift (-o main.s 生成汇编文件)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">* 生成可执行文件</span><br></pre></td></tr></table></figure></p>
-<p>swiftc main.swift -o main<br><code>`</code></p>
-
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">clang main.c -o main</span><br></pre></td></tr></table></figure>
+<ul>
+<li>目标文件生成可执行文件</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">clang main.o -o main</span><br></pre></td></tr></table></figure>
+<h3 id="Swiftc指令-编译Swift文件"><a href="#Swiftc指令-编译Swift文件" class="headerlink" title="Swiftc指令(编译Swift文件)."></a>Swiftc指令(编译Swift文件).</h3><ul>
+<li>生成语法数</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">swiftc -dump-ast main.swift</span><br></pre></td></tr></table></figure>
+<ul>
+<li>生成Swift IL(SIL)</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">swiftc -emit-sil main.swift</span><br></pre></td></tr></table></figure>
+<ul>
+<li>生成LLVM IR</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">swiftc -emit-ir main.swift （-o main.ll 生成IR文件）</span><br></pre></td></tr></table></figure>
+<ul>
+<li>生成汇编</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">swiftc -emit-assembly main.swift (-o main.s 生成汇编文件)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>生成可执行文件</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">swiftc main.swift -o main</span><br></pre></td></tr></table></figure>
       
     </div>
     
@@ -573,7 +590,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Clang指令-编译C-C-Objective-C等源码"><span class="nav-number">1.</span> <span class="nav-text">Clang指令(编译C,C++,Objective-C等源码)</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Clang指令-编译C-C-Objective-C等源码"><span class="nav-number">1.</span> <span class="nav-text">Clang指令(编译C,C++,Objective-C等源码)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Swiftc指令-编译Swift文件"><span class="nav-number">2.</span> <span class="nav-text">Swiftc指令(编译Swift文件).</span></a></li></ol></div>
             
 
           </div>
