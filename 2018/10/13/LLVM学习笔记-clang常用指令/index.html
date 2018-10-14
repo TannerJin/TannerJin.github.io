@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="iOS逆向,iOS逆向学习笔记," />
+  <meta name="keywords" content="LLVM,LLVM学习笔记," />
 
 
 
@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="最近买了庆总的《iOS应用逆向与安全》，学习过程中，记录下自己的总结，以后忘了好方便来查。。。（强烈建议买一本回去读，能够系统性的学习逆向方面的知识。如果基础不够可以再买一本狗神的小黄书《iOS应用逆向工程》） 逆向了解通过越狱获取手机的root权限后，访问整个手机的文件系统，编写动态库注入到指定的应用中。">
-<meta name="keywords" content="iOS逆向,iOS逆向学习笔记">
+<meta name="description" content="最近开始研究代码混淆这反面的东西，发现混淆最好的地方是在编译过程中。这样不会影响正常的业务开发，对源码无侵害。顾开始学习LLVM，当然主要学习的是LLVM的Pass层。对LLVM不太清楚的可以看看关于LLVM，这些东西你必须知道！">
+<meta name="keywords" content="LLVM,LLVM学习笔记">
 <meta property="og:type" content="article">
-<meta property="og:title" content="iOS逆向学习笔记">
-<meta property="og:url" content="http://yoursite.com/2018/09/09/iOS逆向学习笔记/index.html">
+<meta property="og:title" content="LLVM学习笔记-Clang和SwiftC常用指令使用">
+<meta property="og:url" content="http://yoursite.com/2018/10/13/LLVM学习笔记-clang常用指令/index.html">
 <meta property="og:site_name" content="Tanner Jin">
-<meta property="og:description" content="最近买了庆总的《iOS应用逆向与安全》，学习过程中，记录下自己的总结，以后忘了好方便来查。。。（强烈建议买一本回去读，能够系统性的学习逆向方面的知识。如果基础不够可以再买一本狗神的小黄书《iOS应用逆向工程》） 逆向了解通过越狱获取手机的root权限后，访问整个手机的文件系统，编写动态库注入到指定的应用中。">
+<meta property="og:description" content="最近开始研究代码混淆这反面的东西，发现混淆最好的地方是在编译过程中。这样不会影响正常的业务开发，对源码无侵害。顾开始学习LLVM，当然主要学习的是LLVM的Pass层。对LLVM不太清楚的可以看看关于LLVM，这些东西你必须知道！">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-10-13T14:34:24.550Z">
+<meta property="og:updated_time" content="2018-10-14T05:03:57.236Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="iOS逆向学习笔记">
-<meta name="twitter:description" content="最近买了庆总的《iOS应用逆向与安全》，学习过程中，记录下自己的总结，以后忘了好方便来查。。。（强烈建议买一本回去读，能够系统性的学习逆向方面的知识。如果基础不够可以再买一本狗神的小黄书《iOS应用逆向工程》） 逆向了解通过越狱获取手机的root权限后，访问整个手机的文件系统，编写动态库注入到指定的应用中。">
+<meta name="twitter:title" content="LLVM学习笔记-Clang和SwiftC常用指令使用">
+<meta name="twitter:description" content="最近开始研究代码混淆这反面的东西，发现混淆最好的地方是在编译过程中。这样不会影响正常的业务开发，对源码无侵害。顾开始学习LLVM，当然主要学习的是LLVM的Pass层。对LLVM不太清楚的可以看看关于LLVM，这些东西你必须知道！">
 
 
 
@@ -120,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/09/09/iOS逆向学习笔记/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/10/13/LLVM学习笔记-clang常用指令/"/>
 
 
 
 
 
-  <title>iOS逆向学习笔记 | Tanner Jin</title>
+  <title>LLVM学习笔记-Clang和SwiftC常用指令使用 | Tanner Jin</title>
   
 
 
@@ -253,7 +253,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/09/iOS逆向学习笔记/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/13/LLVM学习笔记-clang常用指令/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Tanner Jin">
@@ -270,7 +270,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">iOS逆向学习笔记</h1>
+          <h1 class="post-title" itemprop="name headline">LLVM学习笔记-Clang和SwiftC常用指令使用</h1>
         
 
         <div class="post-meta">
@@ -282,8 +282,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-09T12:02:37+08:00">
-                2018-09-09
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-13T22:32:23+08:00">
+                2018-10-13
               </time>
             
 
@@ -305,8 +305,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/iOS/" itemprop="url" rel="index">
-                    <span itemprop="name">iOS</span>
+                  <a href="/categories/LLVM/" itemprop="url" rel="index">
+                    <span itemprop="name">LLVM</span>
                   </a>
                 </span>
 
@@ -342,21 +342,45 @@
       
 
       
-        <p>最近买了庆总的<a href="https://detail.tmall.com/item.htm?id=570691214072" target="_blank" rel="noopener">《iOS应用逆向与安全》</a>，学习过程中，记录下自己的总结，以后忘了好方便来查。。。（强烈建议买一本回去读，能够系统性的学习逆向方面的知识。如果基础不够可以再买一本狗神的小黄书<a href="https://item.jd.com/11670145.html" target="_blank" rel="noopener">《iOS应用逆向工程》</a>）</p>
-<h3 id="逆向了解"><a href="#逆向了解" class="headerlink" title="逆向了解"></a>逆向了解</h3><p>通过越狱获取手机的root权限后，访问整个手机的文件系统，编写动态库注入到指定的应用中。</p>
+        <p>最近开始研究代码混淆这反面的东西，发现混淆最好的地方是在编译过程中。这样不会影响正常的业务开发，对源码无侵害。顾开始学习LLVM，当然主要学习的是LLVM的Pass层。<br>对LLVM不太清楚的可以看看<a href="http://www.alonemonkey.com/2016/12/21/learning-llvm/" target="_blank" rel="noopener">关于LLVM，这些东西你必须知道！</a> </p>
 <a id="more"></a>
-<h3 id="基础了解"><a href="#基础了解" class="headerlink" title="基础了解"></a>基础了解</h3><p>通过Mac端的iFunBox了解iPhone的文件系统(或者iPhone的越狱商店的iFile)</p>
-<h3 id="逆向流程-自己通过学习实践总结的，可能会有遗漏。。。"><a href="#逆向流程-自己通过学习实践总结的，可能会有遗漏。。。" class="headerlink" title="逆向流程(自己通过学习实践总结的，可能会有遗漏。。。)"></a>逆向流程(自己通过学习实践总结的，可能会有遗漏。。。)</h3><ol>
-<li>reveal静态分析界面, Cycript动态分析界面</li>
-<li>获取应用安装包，解密应用，class-dump出头文件</li>
-<li>根据以上两点，找到函数的大概或者具体位置后，hook函数相关的类，打印函数执行的信息来验证函数。</li>
-<li>找到具体函数后，将软件的可执行文件放入hopper或者ida中进行静态分析函数执行逻辑。</li>
-<li>通过lldb以及上个步骤获取到函数的文件偏移地址，对APP进行动态调试，打印函数参数等信息</li>
-<li>根据4和5来分析函数后，想好如何修改函数逻辑。</li>
-<li>通过Theos编写hook代码，打包成dylib动态库。</li>
-<li>(越狱)将动态库直接安装到越狱手机中(通过DYLD_INSERT_LIBRAPIES配置环境变量)</li>
-<li>(非越狱)修改APP二进制的Load Commands，将7打包好的动态库放入到APP安装包中，对APP二进制以及APP中的动态库进行重签名后，安装到非越狱手机中</li>
-</ol>
+<p>提示：在使用clang编译源代码时，可能会报找不到头文件错误，这是因为系统的/usr/include目录缺失，在源代码预编译的时候，#include替换成成/usr/include目录文件路径。如何安装呢? 命令行输入<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xcode-select --install</span><br></pre></td></tr></table></figure></p>
+<p>指令即可。如果usr目录下还没有include文件，就将Xcode安装好的include文件链接到usr目录下。在命令行执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo ln -s /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14(*这里更加自己目录下的版本自行修改).sdk/usr/include usr/include</span><br></pre></td></tr></table></figure>
+<h3 id="Clang指令-编译C-C-Objective-C等源码"><a href="#Clang指令-编译C-C-Objective-C等源码" class="headerlink" title="Clang指令(编译C,C++,Objective-C等源码)"></a>Clang指令(编译C,C++,Objective-C等源码)</h3><ul>
+<li>源代码生成IR文件</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">clang -emit-llvm main.c -S -o main.ll</span><br></pre></td></tr></table></figure>
+<ul>
+<li>源代码生成字节码文件(bitCode)</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">clang -emit-llvm main.c -c -o main.bc</span><br></pre></td></tr></table></figure>
+<ul>
+<li>将IR文件转化成BitCode格式文件</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">llvm-as main.ll -o main.bc</span><br></pre></td></tr></table></figure>
+<ul>
+<li>源代码生成汇编文件</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">clang main.c -S -o main.s</span><br></pre></td></tr></table></figure>
+<ul>
+<li>将BitCode文件转化成汇编文件</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">llc main.bc -o main.s</span><br></pre></td></tr></table></figure>
+<ul>
+<li>源代码生成目标文件</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">clang main.c -o main.o</span><br></pre></td></tr></table></figure>
+<ul>
+<li>源代码生成可执行文件</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">clang main.c -o main</span><br><span class="line">```  </span><br><span class="line"></span><br><span class="line">* 目标文件生成可执行文件</span><br></pre></td></tr></table></figure>
+<p>clang main.o -o main<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line">### Swiftc指令(编译Swift文件)</span><br><span class="line"></span><br><span class="line">* 生成语法数</span><br></pre></td></tr></table></figure></p>
+<p>swiftc -dump-ast main.swift<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">* 生成Swift IL(SIL)</span><br></pre></td></tr></table></figure></p>
+<p>swiftc -emit-sil main.swift<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">* 生成LLVM IR</span><br></pre></td></tr></table></figure></p>
+<p>swiftc -emit-ir main.swift （-o main.ll 生成IR文件）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">* 生成汇编</span><br></pre></td></tr></table></figure></p>
+<p>swiftc -emit-assembly main.swift (-o main.s 生成汇编文件)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">* 生成可执行文件</span><br></pre></td></tr></table></figure></p>
+<p>swiftc main.swift -o main<br><code>`</code></p>
 
       
     </div>
@@ -374,9 +398,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/iOS逆向/" rel="tag"># iOS逆向</a>
+            <a href="/tags/LLVM/" rel="tag"># LLVM</a>
           
-            <a href="/tags/iOS逆向学习笔记/" rel="tag"># iOS逆向学习笔记</a>
+            <a href="/tags/LLVM学习笔记/" rel="tag"># LLVM学习笔记</a>
           
         </div>
       
@@ -389,8 +413,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/07/02/Swift中Codable网络层设计/" rel="next" title="Swift面向协议和Codable的网络层设计">
-                <i class="fa fa-chevron-left"></i> Swift面向协议和Codable的网络层设计
+              <a href="/2018/09/19/iOS安全-字符串加密-Swift/" rel="next" title="iOS安全-字符串加密(Swift)">
+                <i class="fa fa-chevron-left"></i> iOS安全-字符串加密(Swift)
               </a>
             
           </div>
@@ -398,10 +422,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/09/09/iOS逆向学习笔记-一-界面分析/" rel="prev" title="iOS逆向学习笔记(一) 界面分析">
-                iOS逆向学习笔记(一) 界面分析 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -553,7 +573,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#逆向了解"><span class="nav-number">1.</span> <span class="nav-text">逆向了解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#基础了解"><span class="nav-number">2.</span> <span class="nav-text">基础了解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#逆向流程-自己通过学习实践总结的，可能会有遗漏。。。"><span class="nav-number">3.</span> <span class="nav-text">逆向流程(自己通过学习实践总结的，可能会有遗漏。。。)</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Clang指令-编译C-C-Objective-C等源码"><span class="nav-number">1.</span> <span class="nav-text">Clang指令(编译C,C++,Objective-C等源码)</span></a></li></ol></div>
             
 
           </div>
