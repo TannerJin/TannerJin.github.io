@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="others," />
+  <meta name="keywords" content="iOS,Swift," />
 
 
 
@@ -79,18 +79,27 @@
 
 
 
-<meta name="description" content="本应用尊重并保护所有使用服务用户的个人隐私权。为了给您提供更准确、更有个性化的服务，本应用会按照本隐私权政策的规定使用和披露您的个人信息。但本应用将以高度的勤勉、审慎义务对待这些信息。除本隐私权政策另有规定外，在未征得您事先许可的情况下，本应用不会将这些信息对外披露或向第三方提供。本应用会不时更新本隐私权政策。 您在同意本应用服务使用协议之时，即视为您已经同意本隐私权政策全部内容。本隐私权政策属于">
-<meta name="keywords" content="others">
+<meta name="description" content="通常我们去获取奔溃日志都是通过NSSetUncaughtExceptionHandler这个API得到NSException对象的信息。对于NSArray对象的数据越界是有用的，但是对于Array的数据越界是不会触发这个方法的。">
+<meta name="keywords" content="iOS,Swift">
 <meta property="og:type" content="article">
-<meta property="og:title" content="iOS隐私政策">
-<meta property="og:url" content="http://yoursite.com/2018/10/29/iOS隐私政策/index.html">
+<meta property="og:title" content="Swift数组越界分析">
+<meta property="og:url" content="http://yoursite.com/2018/12/20/Swift数组越界分析/index.html">
 <meta property="og:site_name" content="Tanner Jin">
-<meta property="og:description" content="本应用尊重并保护所有使用服务用户的个人隐私权。为了给您提供更准确、更有个性化的服务，本应用会按照本隐私权政策的规定使用和披露您的个人信息。但本应用将以高度的勤勉、审慎义务对待这些信息。除本隐私权政策另有规定外，在未征得您事先许可的情况下，本应用不会将这些信息对外披露或向第三方提供。本应用会不时更新本隐私权政策。 您在同意本应用服务使用协议之时，即视为您已经同意本隐私权政策全部内容。本隐私权政策属于">
+<meta property="og:description" content="通常我们去获取奔溃日志都是通过NSSetUncaughtExceptionHandler这个API得到NSException对象的信息。对于NSArray对象的数据越界是有用的，但是对于Array的数据越界是不会触发这个方法的。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-10-29T15:21:53.134Z">
+<meta property="og:image" content="http://yoursite.com/images/OutOfRange-NSArray.png">
+<meta property="og:image" content="http://yoursite.com/images/OutOfRange-Array.png">
+<meta property="og:image" content="http://yoursite.com/images/OutOfRange-Array1.png">
+<meta property="og:image" content="http://yoursite.com/images/OutOfRange-Array2.png">
+<meta property="og:image" content="http://yoursite.com/images/OutOfRange-Array3.png">
+<meta property="og:image" content="http://yoursite.com/images/OutOfRange-Array4.png">
+<meta property="og:image" content="http://yoursite.com/images/OutOfRange-Array5.png">
+<meta property="og:image" content="http://yoursite.com/images/OutOfRange-Array6.png">
+<meta property="og:updated_time" content="2018-12-20T09:25:35.643Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="iOS隐私政策">
-<meta name="twitter:description" content="本应用尊重并保护所有使用服务用户的个人隐私权。为了给您提供更准确、更有个性化的服务，本应用会按照本隐私权政策的规定使用和披露您的个人信息。但本应用将以高度的勤勉、审慎义务对待这些信息。除本隐私权政策另有规定外，在未征得您事先许可的情况下，本应用不会将这些信息对外披露或向第三方提供。本应用会不时更新本隐私权政策。 您在同意本应用服务使用协议之时，即视为您已经同意本隐私权政策全部内容。本隐私权政策属于">
+<meta name="twitter:title" content="Swift数组越界分析">
+<meta name="twitter:description" content="通常我们去获取奔溃日志都是通过NSSetUncaughtExceptionHandler这个API得到NSException对象的信息。对于NSArray对象的数据越界是有用的，但是对于Array的数据越界是不会触发这个方法的。">
+<meta name="twitter:image" content="http://yoursite.com/images/OutOfRange-NSArray.png">
 
 
 
@@ -120,13 +129,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/10/29/iOS隐私政策/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/12/20/Swift数组越界分析/"/>
 
 
 
 
 
-  <title>iOS隐私政策 | Tanner Jin</title>
+  <title>Swift数组越界分析 | Tanner Jin</title>
   
 
 
@@ -253,7 +262,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/29/iOS隐私政策/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/20/Swift数组越界分析/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Tanner Jin">
@@ -270,7 +279,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">iOS隐私政策</h1>
+          <h1 class="post-title" itemprop="name headline">Swift数组越界分析</h1>
         
 
         <div class="post-meta">
@@ -282,8 +291,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-29T23:10:04+08:00">
-                2018-10-29
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-20T14:10:09+08:00">
+                2018-12-20
               </time>
             
 
@@ -292,28 +301,6 @@
             
           </span>
 
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/iOS/" itemprop="url" rel="index">
-                    <span itemprop="name">iOS</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
           
 
           
@@ -342,54 +329,28 @@
       
 
       
-        <p>本应用尊重并保护所有使用服务用户的个人隐私权。为了给您提供更准确、更有个性化的服务，本应用会按照本隐私权政策的规定使用和披露您的个人信息。但本应用将以高度的勤勉、审慎义务对待这些信息。除本隐私权政策另有规定外，在未征得您事先许可的情况下，本应用不会将这些信息对外披露或向第三方提供。本应用会不时更新本隐私权政策。 您在同意本应用服务使用协议之时，即视为您已经同意本隐私权政策全部内容。本隐私权政策属于本应用服务使用协议不可分割的一部分。</p>
-<a id="more"></a> 
-<ol>
-<li>适用范围</li>
+        <p>通常我们去获取奔溃日志都是通过NSSetUncaughtExceptionHandler这个API得到NSException对象的信息。对于NSArray对象的数据越界是有用的，但是对于Array的数据越界是不会触发这个方法的。</p>
+<a id="more"></a>
+<h3 id="NSArray和Array越界处理机制"><a href="#NSArray和Array越界处理机制" class="headerlink" title="NSArray和Array越界处理机制"></a>NSArray和Array越界处理机制</h3><h4 id="NSArray"><a href="#NSArray" class="headerlink" title="NSArray"></a>NSArray</h4><p> 测试源码 </p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> arr = [<span class="number">1</span>, <span class="number">3</span>, <span class="number">4</span>]</span><br><span class="line"><span class="keyword">let</span> array = <span class="type">NSArray</span>(array: arr)</span><br><span class="line"><span class="built_in">print</span>(array[<span class="number">4</span>])</span><br></pre></td></tr></table></figure>
+<p>NSArray越界奔溃线程调用栈<br><img src="\images\OutOfRange-NSArray.png" alt=""><br>可以看出NSArray通过调用[<strong>NSArrayI objectAtIndexedSubscript:]方法获取到具体元素，在该方法调用完成后(pop rbp)，触发了_CFThrowFormattedException方法，一个参数是NSExceptionName对象(NSRangeException), 另一个参数是异常原因(“*** %s: index %lu beyond bounds for empty array”),还有一个参数是调用方法(“-[</strong>NSArrayI objectAtIndexedSubscript:]”)。这三个参数会初始化一个NSException对象，当然当前线程的调用栈信息会赋值给这个NSException对象。这时就可以通过NSSetUncaughtExceptionHandler这个API的回调获取到这个NSException对象信息。    </p>
+<p>最后调用系统内核库的<strong>pthread </strong>kill方法,然后再执行act __set_ _astbsd()方法，最后exit()退出应用。   </p>
+<h4 id="Array"><a href="#Array" class="headerlink" title="Array"></a>Array</h4><p>测试源码</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> arr = [<span class="number">1</span>, <span class="number">3</span>, <span class="number">4</span>]</span><br><span class="line"><span class="built_in">print</span>(arr[<span class="number">4</span>])</span><br></pre></td></tr></table></figure>
+<p>Array越界奔溃线程调用栈<br><img src="\images\OutOfRange-Array.png" alt=""></p>
+<p>可以看到Array越界的处理方式和NSArray完全不一样，最后是通过一个断言方法(Swift._fatalErrorMessage)让程序终止. “/BuildRoot/Library/Caches/com.apple.xbs/Sources/swiftlang_Fall2018/swiftlang_Fall2018-1000.11.37.1/src/swift/stdlib/public/core/ContiguousArrayBuffer.swift”这个路径是Swift Array部分源码的路径，由于Swift开源的，可以到GitHub上clone下来看看<a href="&quot;https://github.com/apple/swift&quot;">源码</a>。   </p>
+<p><img src="\images\OutOfRange-Array1.png" alt=""><br><img src="\images\OutOfRange-Array2.png" alt=""><br>可以看到Array源码获取元素前会先通过断言先判断数组是否会越界。但是我怎么知道这个断言方法被调用呢，或者这个断言触发了什么方法或指令让程序退出呢？<br>通过<a href="&quot;http://www.cocoachina.com/cms/wap.php?id=12301&amp;action=article&quot;">念茜姐姐的这个文章</a>知道了有Mach异常还有Unix信号异常。既然断言不走NSSetUncaughtExceptionHandler，那么很有可能会通过给线程发送异常信号量来处理的。但是由于在debug环境下，Xcode会停在数组越界这行代码，不会再让你的程序往下走了，此时你的程序并没有跑完，可以将编译后的二进制文件在终端上运行(如下图)<br><img src="\images\OutOfRange-Array3.png" alt=""><br>得到运行结果如下：<br><img src="\images\OutOfRange-Array4.png" alt=""><br>得到一个错误的信息(“illegal hardware instruction”), 意思是非法指令，这就知道了，Swift的断言方法触发了非法指令。</p>
+<p>非法指令对应的信号量<br><img src="\images\OutOfRange-Array5.png" alt=""></p>
+<p>这时可以写这么一段代码来检测下了(当然还是在终端上运行编译后的二进制文件)   </p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">signal(<span class="type">SIGILL</span>) &#123; (info) <span class="keyword">in</span></span><br><span class="line">    <span class="built_in">print</span>(info, <span class="string">"我在这里退出了"</span>)</span><br><span class="line">    exit(<span class="number">0</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> arr = [<span class="number">1</span>, <span class="number">3</span>, <span class="number">4</span>]</span><br><span class="line"><span class="built_in">print</span>(arr[<span class="number">4</span>])</span><br></pre></td></tr></table></figure>
+<p>运行结果如下：<br><img src="\images\OutOfRange-Array6.png" alt=""></p>
+<p>bingo！</p>
+<h3 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h3><ol>
+<li>NSArray和Array越界的处理机制不同</li>
+<li>NSArray越界可以通过NSSetUncaughtExceptionHandler获取到程序奔溃的线程调用栈信息。</li>
+<li>Array越界通过断言来处理异常，而断言触发了非法指令信号量，导致程序退出。</li>
+<li>收集Array越界线程调用栈信息，可以通过signal(SIGILL, callBackHandle)方法</li>
 </ol>
-<p>(a) 在您注册本应用帐号时，您根据本应用要求提供的个人注册信息；</p>
-<p>(b) 在您使用本应用网络服务，或访问本应用平台网页时，本应用自动接收并记录的您的浏览器和计算机上的信息，包括但不限于您的IP地址、浏览器的类型、使用的语言、访问日期和时间、软硬件特征信息及您需求的网页记录等数据；</p>
-<p>(c) 本应用通过合法途径从商业伙伴处取得的用户个人数据。</p>
-<p>您了解并同意，以下信息不适用本隐私权政策：</p>
-<p>(a) 您在使用本应用平台提供的搜索服务时输入的关键字信息；</p>
-<p>(b) 本应用收集到的您在本应用发布的有关信息数据，包括但不限于参与活动、成交信息及评价详情；</p>
-<p>(c) 违反法律规定或违反本应用规则行为及本应用已对您采取的措施。</p>
-<ol start="2">
-<li>信息使用</li>
-</ol>
-<p>(a)本应用不会向任何无关第三方提供、出售、出租、分享或交易您的个人信息，除非事先得到您的许可，或该第三方和本应用（含本应用关联公司）单独或共同为您提供服务，且在该服务结束后，其将被禁止访问包括其以前能够访问的所有这些资料。</p>
-<p>(b) 本应用亦不允许任何第三方以任何手段收集、编辑、出售或者无偿传播您的个人信息。任何本应用平台用户如从事上述活动，一经发现，本应用有权立即终止与该用户的服务协议。</p>
-<p>(c) 为服务用户的目的，本应用可能通过使用您的个人信息，向您提供您感兴趣的信息，包括但不限于向您发出产品和服务信息，或者与本应用合作伙伴共享信息以便他们向您发送有关其产品和服务的信息（后者需要您的事先同意）。</p>
-<ol start="3">
-<li>信息披露</li>
-</ol>
-<p>在如下情况下，本应用将依据您的个人意愿或法律的规定全部或部分的披露您的个人信息：</p>
-<p>(a) 经您事先同意，向第三方披露；</p>
-<p>(b)为提供您所要求的产品和服务，而必须和第三方分享您的个人信息；</p>
-<p>(c) 根据法律的有关规定，或者行政或司法机构的要求，向第三方或者行政、司法机构披露；</p>
-<p>(d) 如您出现违反中国有关法律、法规或者本应用服务协议或相关规则的情况，需要向第三方披露；</p>
-<p>(e) 如您是适格的知识产权投诉人并已提起投诉，应被投诉人要求，向被投诉人披露，以便双方处理可能的权利纠纷；</p>
-<p>(f) 在本应用平台上创建的某一交易中，如交易任何一方履行或部分履行了交易义务并提出信息披露请求的，本应用有权决定向该用户提供其交易对方的联络方式等必要信息，以促成交易的完成或纠纷的解决。</p>
-<p>(g) 其它本应用根据法律、法规或者网站政策认为合适的披露。</p>
-<ol start="4">
-<li>信息存储和交换</li>
-</ol>
-<p>本应用收集的有关您的信息和资料将保存在本应用及（或）其关联公司的服务器上，这些信息和资料可能传送至您所在国家、地区或本应用收集信息和资料所在地的境外并在境外被访问、存储和展示。</p>
-<ol start="5">
-<li>Cookie的使用</li>
-</ol>
-<p>(a) 在您未拒绝接受cookies的情况下，本应用会在您的计算机上设定或取用cookies ，以便您能登录或使用依赖于cookies的本应用平台服务或功能。本应用使用cookies可为您提供更加周到的个性化服务，包括推广服务。</p>
-<p>(b) 您有权选择接受或拒绝接受cookies。您可以通过修改浏览器设置的方式拒绝接受cookies。但如果您选择拒绝接受cookies，则您可能无法登录或使用依赖于cookies的本应用网络服务或功能。</p>
-<p>(c) 通过本应用所设cookies所取得的有关信息，将适用本政策。</p>
-<ol start="6">
-<li>信息安全</li>
-</ol>
-<p>(a) 本应用帐号均有安全保护功能，请妥善保管您的用户名及密码信息。本应用将通过对用户密码进行加密等安全措施确保您的信息不丢失，不被滥用和变造。尽管有前述安全措施，但同时也请您注意在信息网络上不存在“完善的安全措施”。</p>
-<p>(b) 在使用本应用网络服务进行网上交易时，您不可避免的要向交易对方或潜在的交易对</p>
-<p>7.本隐私政策的更改</p>
-<p>(a)如果决定更改隐私政策，我们会在本政策中、本公司网站中以及我们认为适当的位置发布这些更改，以便您了解我们如何收集、使用您的个人信息，哪些人可以访问这些信息，以及在什么情况下我们会透露这些信息。</p>
-<p>(b)本公司保留随时修改本政策的权利，因此请经常查看。如对本政策作出重大更改，本公司会通过网站通知的形式告知。</p>
-<p>方披露自己的个人信息，如联络方式或者邮政地址。请您妥善保护自己的个人信息，仅在必要的情形下向他人提供。如您发现自己的个人信息泄密，尤其是本应用用户名及密码发生泄露，请您立即联络本应用客服，以便本应用采取相应措施。</p>
 
       
     </div>
@@ -407,7 +368,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/others/" rel="tag"># others</a>
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
+          
+            <a href="/tags/Swift/" rel="tag"># Swift</a>
           
         </div>
       
@@ -420,8 +383,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/10/13/LLVM学习笔记-clang常用指令/" rel="next" title="LLVM学习笔记-Clang和SwiftC常用指令使用">
-                <i class="fa fa-chevron-left"></i> LLVM学习笔记-Clang和SwiftC常用指令使用
+              <a href="/2018/10/29/iOS隐私政策/" rel="next" title="iOS隐私政策">
+                <i class="fa fa-chevron-left"></i> iOS隐私政策
               </a>
             
           </div>
@@ -429,10 +392,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/12/20/Swift数组越界分析/" rel="prev" title="Swift数组越界分析">
-                Swift数组越界分析 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -484,8 +443,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -565,6 +533,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#NSArray和Array越界处理机制"><span class="nav-number">1.</span> <span class="nav-text">NSArray和Array越界处理机制</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#NSArray"><span class="nav-number">1.1.</span> <span class="nav-text">NSArray</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Array"><span class="nav-number">1.2.</span> <span class="nav-text">Array</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#结论"><span class="nav-number">2.</span> <span class="nav-text">结论</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
