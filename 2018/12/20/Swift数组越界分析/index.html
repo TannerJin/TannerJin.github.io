@@ -95,7 +95,7 @@
 <meta property="og:image" content="http://yoursite.com/images/OutOfRange-Array4.png">
 <meta property="og:image" content="http://yoursite.com/images/OutOfRange-Array5.png">
 <meta property="og:image" content="http://yoursite.com/images/OutOfRange-Array6.png">
-<meta property="og:updated_time" content="2018-12-20T09:25:35.643Z">
+<meta property="og:updated_time" content="2018-12-20T09:49:25.732Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Swift数组越界分析">
 <meta name="twitter:description" content="通常我们去获取奔溃日志都是通过NSSetUncaughtExceptionHandler这个API得到NSException对象的信息。对于NSArray对象的数据越界是有用的，但是对于Array的数据越界是不会触发这个方法的。">
@@ -348,7 +348,7 @@
 <h3 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h3><ol>
 <li>NSArray和Array越界的处理机制不同</li>
 <li>NSArray越界可以通过NSSetUncaughtExceptionHandler获取到程序奔溃的线程调用栈信息。</li>
-<li>Array越界通过断言来处理异常，而断言触发了非法指令信号量，导致程序退出。</li>
+<li>Array越界通过断言来处理异常，而断言执行了非法指令，导致程序退出。</li>
 <li>收集Array越界线程调用栈信息，可以通过signal(SIGILL, callBackHandle)方法</li>
 </ol>
 
