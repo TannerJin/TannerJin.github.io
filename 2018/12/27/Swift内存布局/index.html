@@ -98,7 +98,10 @@
 <meta property="og:image" content="http://yoursite.com/images/Swift_memoryLayout/swiftObject_class_memory.png">
 <meta property="og:image" content="http://yoursite.com/images/Swift_memoryLayout/classB_memory.png">
 <meta property="og:image" content="http://yoursite.com/images/Swift_memoryLayout/NSObject_memory.png">
-<meta property="og:updated_time" content="2018-12-27T11:17:47.551Z">
+<meta property="og:image" content="http://yoursite.com/images/Swift_memoryLayout/objc.png">
+<meta property="og:image" content="http://yoursite.com/images/Swift_memoryLayout/associative1.png">
+<meta property="og:image" content="http://yoursite.com/images/Swift_memoryLayout/associative2.png">
+<meta property="og:updated_time" content="2018-12-28T02:55:18.733Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Swift内存布局">
 <meta name="twitter:description" content="参考链接1参考链接2 ClassSwift中的Class在内存中其实就是一个Objective-C的Class,也就是说Swift的Class和Objective-C的Class一样也是runtime的机制的一部分，即Swift中的Class的也是一个对象(类对象，和Objective-C一样)。">
@@ -333,7 +336,8 @@
 
       
         <p><a href="https://www.youtube.com/watch?v=ERYNyrfXjlg&amp;t=498s" target="_blank" rel="noopener">参考链接1</a><br><a href="https://academy.realm.io/posts/goto-mike-ash-exploring-swift-memory-layout/" target="_blank" rel="noopener">参考链接2</a></p>
-<h3 id="Class"><a href="#Class" class="headerlink" title="Class"></a>Class</h3><p>Swift中的Class在内存中其实就是一个Objective-C的Class,也就是说Swift的Class和Objective-C的Class一样也是runtime的机制的一部分，即Swift中的Class的也是一个对象(类对象，和Objective-C一样)。<br><a id="more"></a><br>(所以不要说Swift没有runtime机制了，Swift的Class也还是runtime机制的一部分，只不过Swift的方法调用并不像Objective-C那样遵循runtime机制中的消息机制，Swift方法调用比较复杂，可以期待我的下篇文章”Swift方法调用”) </p>
+<h3 id="Class"><a href="#Class" class="headerlink" title="Class"></a>Class</h3><p>Swift中的Class在内存中其实就是一个Objective-C的Class,也就是说Swift的Class和Objective-C的Class一样也是runtime的机制的一部分，即Swift中的Class的也是一个对象(类对象，和Objective-C一样)。<br><a id="more"></a>  </p>
+<p>(所以不要说Swift没有runtime机制了，Swift的Class也还是runtime机制的一部分，只不过Swift的方法调用并不像Objective-C那样遵循runtime机制中的消息机制，Swift方法调用比较复杂，可以期待我的下篇文章”Swift方法调用”) </p>
 <p>其实在objc源码中也能发现些信息(Swift类对象也是继承于objc_class,不过多了些参数)：<br><img src="\images\Swift_memoryLayout\swift_objc_class.png" alt=""><br><img src="\images\Swift_memoryLayout\objc_class.png" alt="">  </p>
 <h4 id="总结以及论证"><a href="#总结以及论证" class="headerlink" title="总结以及论证"></a><strong>总结以及论证</strong></h4><h5 id="Swift中的实例对象和Objective-C中的实例对象一样是一个objc-object结构体，第一个参数是isa指针，指向Swift的类对象"><a href="#Swift中的实例对象和Objective-C中的实例对象一样是一个objc-object结构体，第一个参数是isa指针，指向Swift的类对象" class="headerlink" title="Swift中的实例对象和Objective-C中的实例对象一样是一个objc_object结构体，第一个参数是isa指针，指向Swift的类对象"></a>Swift中的实例对象和Objective-C中的实例对象一样是一个objc_object结构体，第一个参数是isa指针，指向Swift的类对象</h5><p>// 测试代码     </p>
 <pre><code><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Foo</span> </span>&#123;</span><br><span class="line">     <span class="keyword">let</span> a = <span class="number">6</span>          <span class="comment">// 64位机器，Int类型默认为Int64，64位8字节，编译器会分配8个字节给a</span></span><br><span class="line">     <span class="keyword">let</span> b: <span class="type">Int8</span> = <span class="number">9</span>    <span class="comment">// Int8 8位一个字节，编译器会分配1个字节给b</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">let</span> foo = <span class="type">Foo</span>()</span><br><span class="line"><span class="keyword">let</span> fooClass = objc_getClass(<span class="string">"_TtC12SwiftRuntime3Foo"</span>)!    <span class="comment">// or SwiftRuntime.Foo</span></span><br></pre></td></tr></table></figure>
@@ -380,6 +384,11 @@
 <li>自定义的Class在编译后都会继承于SwiftObject，而SwiftObject没有父类   </li>
 <li>继承于NSObject的类编译后的父类还是NSObject，而NSObject也一样没有父类  </li>
 </ol>
+<h5 id="Swift中类的扩展-extension-能关联对象-因为它是一个id类型-objc-object"><a href="#Swift中类的扩展-extension-能关联对象-因为它是一个id类型-objc-object" class="headerlink" title="Swift中类的扩展(extension)能关联对象,因为它是一个id类型(objc_object)"></a>Swift中类的扩展(extension)能关联对象,因为它是一个id类型(objc_object)</h5><p>源码如图所示：<br><img src="\images\Swift_memoryLayout\objc.png" alt=""><br><img src="\images\Swift_memoryLayout\associative1.png" alt=""></p>
+<p>如果有兴趣看如何实现的关联对象功能的可以看看以下源码(本文主要分析的是Swift的内存布局,就不分析啦~)</p>
+<p><img src="\images\Swift_memoryLayout\associative2.png" alt="">    </p>
+<p>简单来说就是有一个关联对象管理者的一个单例(AssociationsManager), 这个单例有一个属性 是关联对象hash表(AssociationsHashMap)。这个hash表的key就是id(objc_object)的指针，value就是这个id(objc_object)对应的对象关联表(ObjectAssociationMap)。通过参数value生成一个关联对象(ObjcAssociation), 然后给id对应的对象关联表(ObjectAssociationMap)通过参数key设置生成的关联对象(ObjcAssociation).</p>
+<p> ps: 如果你试过给Swift的Array，String…这些结构体去关联对象，会发现也能关联上。这是因为当被需要时，Swift的值类型会自动转化成对象类型(<a href="https://forums.swift.org/t/swift-struct-extension-associatedobject/18550/6" target="_blank" rel="noopener">我和同事Andrew的提问以及苹果员工的回答</a>)。<br>至于怎么转的，我发现了他们其实是遵循了_ObjectiveCBridgeable这个协议，这个协议会关联一个object类型(Array关联的是NSArray)，协议里的有一些相互转化的方法(自己实现)，实现了值类型和关联的对象类型相互转化。</p>
 <h3 id="Struct"><a href="#Struct" class="headerlink" title="Struct"></a>Struct</h3>
       
     </div>
@@ -570,7 +579,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Class"><span class="nav-number">1.</span> <span class="nav-text">Class</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#总结以及论证"><span class="nav-number">1.1.</span> <span class="nav-text">总结以及论证</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Swift中的实例对象和Objective-C中的实例对象一样是一个objc-object结构体，第一个参数是isa指针，指向Swift的类对象"><span class="nav-number">1.1.1.</span> <span class="nav-text">Swift中的实例对象和Objective-C中的实例对象一样是一个objc_object结构体，第一个参数是isa指针，指向Swift的类对象</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Swift中的Class在内存和一个Objective-C的Class是相同的-即Swift中的Class编译后都会生成Runtime的objc-class结构体对象"><span class="nav-number">1.1.2.</span> <span class="nav-text">Swift中的Class在内存和一个Objective-C的Class是相同的, 即Swift中的Class编译后都会生成Runtime的objc_class结构体对象.</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Struct"><span class="nav-number">2.</span> <span class="nav-text">Struct</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Class"><span class="nav-number">1.</span> <span class="nav-text">Class</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#总结以及论证"><span class="nav-number">1.1.</span> <span class="nav-text">总结以及论证</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Swift中的实例对象和Objective-C中的实例对象一样是一个objc-object结构体，第一个参数是isa指针，指向Swift的类对象"><span class="nav-number">1.1.1.</span> <span class="nav-text">Swift中的实例对象和Objective-C中的实例对象一样是一个objc_object结构体，第一个参数是isa指针，指向Swift的类对象</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Swift中的Class在内存和一个Objective-C的Class是相同的-即Swift中的Class编译后都会生成Runtime的objc-class结构体对象"><span class="nav-number">1.1.2.</span> <span class="nav-text">Swift中的Class在内存和一个Objective-C的Class是相同的, 即Swift中的Class编译后都会生成Runtime的objc_class结构体对象.</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Swift中类的扩展-extension-能关联对象-因为它是一个id类型-objc-object"><span class="nav-number">1.1.3.</span> <span class="nav-text">Swift中类的扩展(extension)能关联对象,因为它是一个id类型(objc_object)</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Struct"><span class="nav-number">2.</span> <span class="nav-text">Struct</span></a></li></ol></div>
             
 
           </div>
