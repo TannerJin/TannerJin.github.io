@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Swift," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="参考链接 阅读本文前，可以先参考Swift内存布局 编译型程序的方法调用有三种方式，第一种是直接调用，运行时寄存器通过call指令直接跳转至函数的具体实现。第二种通过虚函数表的方式，通过计算出函数指针在虚函数表中偏移量，得到函数指针，在通过call指令跳转到函数指针指向的内存地址，执行函数。第三种是消息机制，在Objective-C或者Swift(部分方法调用)中通过call objc_msgSe">
+<meta name="keywords" content="Swift">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Swift方法调用">
+<meta property="og:url" content="http://yoursite.com/2019/01/06/Swift方法调用/index.html">
+<meta property="og:site_name" content="Tanner Jin">
+<meta property="og:description" content="参考链接 阅读本文前，可以先参考Swift内存布局 编译型程序的方法调用有三种方式，第一种是直接调用，运行时寄存器通过call指令直接跳转至函数的具体实现。第二种通过虚函数表的方式，通过计算出函数指针在虚函数表中偏移量，得到函数指针，在通过call指令跳转到函数指针指向的内存地址，执行函数。第三种是消息机制，在Objective-C或者Swift(部分方法调用)中通过call objc_msgSe">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/images/Swift_MethodDispatch/Class_instace_method.png">
+<meta property="og:image" content="http://yoursite.com/images/Swift_MethodDispatch/Class_instace_method2.png">
+<meta property="og:image" content="http://yoursite.com/images/Swift_MethodDispatch/Class_instace_method3.png">
+<meta property="og:updated_time" content="2019-01-06T15:20:22.960Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Swift方法调用">
+<meta name="twitter:description" content="参考链接 阅读本文前，可以先参考Swift内存布局 编译型程序的方法调用有三种方式，第一种是直接调用，运行时寄存器通过call指令直接跳转至函数的具体实现。第二种通过虚函数表的方式，通过计算出函数指针在虚函数表中偏移量，得到函数指针，在通过call指令跳转到函数指针指向的内存地址，执行函数。第三种是消息机制，在Objective-C或者Swift(部分方法调用)中通过call objc_msgSe">
+<meta name="twitter:image" content="http://yoursite.com/images/Swift_MethodDispatch/Class_instace_method.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/01/06/Swift方法调用/"/>
+
+
+
+
+
+  <title>Swift方法调用 | Tanner Jin</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Tanner Jin</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/06/Swift方法调用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Tanner Jin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tanner Jin">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Swift方法调用</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-06T12:49:55+08:00">
+                2019-01-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><a href="https://lists.swift.org/pipermail/swift-evolution/Week-of-Mon-20151207/001922.html" target="_blank" rel="noopener">参考链接</a></p>
+<p>阅读本文前，可以先参考<a href="https://jintao1997.github.io/2018/12/27/Swift%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80/" target="_blank" rel="noopener">Swift内存布局</a></p>
+<p>编译型程序的方法调用有三种方式，第一种是直接调用，运行时寄存器通过call指令直接跳转至函数的具体实现。第二种通过虚函数表的方式，通过计算出函数指针在虚函数表中偏移量，得到函数指针，在通过call指令跳转到函数指针指向的内存地址，执行函数。第三种是消息机制，在Objective-C或者Swift(部分方法调用)中通过call objc_msgSend，在执行objc _ msgSend方法时，找到参数类对象(objc_ class)中method__list真正函数实现的指针(IMP)，在跳转至函数指针指向的内存执行具体的函数，当然没找到函数指针，会去父类中找，最后在NSObject类对象中没有找到函数指针，还会进行消息转发。</p>
+<a id="more"></a>
+<p>我们都知道在Objective-C语言中，继承于NSObject类的实例方法或者类方法调用编译后都会通过objc_msgSend去找到具体的函数然后实现。而对于Swift，三种方法调用都存在。由于不是所有的数据结构都是Class(即编译后不会生成对应的objc _ class)，顾方法调用不都是消息机制。即使对于Class，由于Swift中虚函数表的存在以及编译的优化(方法加了@objc也不一定走消息机制)，方法调用方式也复杂不少</p>
+<h2 id="Class中的方法调用"><a href="#Class中的方法调用" class="headerlink" title="Class中的方法调用"></a>Class中的方法调用</h2><h3 id="实例方法的调用"><a href="#实例方法的调用" class="headerlink" title="实例方法的调用"></a>实例方法的调用</h3><p>对于没加@objc的实例方法，编译后在类对象中的vtable以指针的方式指向该函数的具体实现。<br>而对于加了@objc的实例方法，编译后该方法函数指针会在vtable中存在，而且还会以指针的形式在类对象中的method_list中存在。   </p>
+<p>对于没加@objc的方法，只能通过函数指针方式实现具体方法。<br>而对于加了@objc的方法，由于Swift的编译优化，没有通过Selector调用的方法，编译后还是会走虚函数表的机制。而通过Selector调用的方法，编译后会走消息机制。当然还有一个编译参数dynamic，对于dynamic修饰的方法，编译后不管是否通过Selector调用都会走消息机制。</p>
+<p>接下来举个demo，通过替换虚函数表中的函数指针以及运行时的方法交换，来验证函数的调用方式。以及通过反编译二进制文件，看函数调用的汇编指令，来查看调用方式。</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Foundation</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Foo</span>: <span class="title">NSObject</span> </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> name: <span class="type">String</span> = <span class="string">"Foo"</span></span><br><span class="line">    </span><br><span class="line">    <span class="meta">@objc</span> <span class="function"><span class="keyword">func</span> <span class="title">foo</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">"foo"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">foo2</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">"foo2"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Poo</span> </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> name: <span class="type">String</span> = <span class="string">"Poo"</span></span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">poo</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">"poo"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">poo2</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">"poo2"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 获取object的指针</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">getPointer</span>&lt;T: AnyObject&gt;<span class="params">(objc: T)</span></span> -&gt; <span class="type">UnsafeMutableRawPointer</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="type">Unmanaged</span>.passUnretained(objc).toOpaque()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// foo类对象指针</span></span><br><span class="line"><span class="keyword">let</span> fooClass = objc_getClass(<span class="string">"SwiftRuntime.Foo"</span>)! <span class="keyword">as</span> <span class="type">AnyObject</span></span><br><span class="line"><span class="keyword">var</span> fooClassPointer = getPointer(objc: fooClass)</span><br><span class="line"></span><br><span class="line"><span class="comment">// foo2类对象指针</span></span><br><span class="line"><span class="keyword">let</span> foo2Class = objc_getClass(<span class="string">"SwiftRuntime.Poo"</span>)! <span class="keyword">as</span> <span class="type">AnyObject</span></span><br><span class="line"><span class="keyword">let</span> foo2ClassPointer = getPointer(objc: foo2Class)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 104(第一个函数指针)  方法替换</span></span><br><span class="line"><span class="keyword">let</span> fooMethonPointer = fooClassPointer.advanced(by: <span class="number">104</span>).assumingMemoryBound(to: <span class="type">UnsafeMutableRawPointer</span>.<span class="keyword">self</span>)</span><br><span class="line"><span class="comment">// 将104改为112，实例foo.foo()就会执行Poo的poo2方法（一个指针占8个字节）</span></span><br><span class="line"><span class="keyword">let</span> foo2MethonPointer = foo2ClassPointer.advanced(by: <span class="number">104</span>).assumingMemoryBound(to: <span class="type">UnsafeMutableRawPointer</span>.<span class="keyword">self</span>)</span><br><span class="line">fooMethonPointer.initialize(to: foo2MethonPointer.pointee)</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> foo = <span class="type">Foo</span>()</span><br><span class="line">foo.perform(#selector(<span class="type">Foo</span>.foo))</span><br><span class="line">foo.foo()</span><br><span class="line"><span class="built_in">print</span>(<span class="string">"===end==="</span>)</span><br></pre></td></tr></table></figure>
+<p>运行结果图<br><img src="\images\Swift_MethodDispatch\Class_instace_method.png" alt=""><br>可以看到，在该demo中我只是将Foo虚函数表的第一个函数指针替换成Poo虚函数表的第一个函数指针, 通过直接调用实例foo方法，最后打印了poo，即调用了Poo的poo方法。但是通过Select调用该方法，走的是消息机制，由于没有将Foo类对象的method_list中的foo方法替换(通过method _ exchange API替换，或者自己找到对应函数指针去替换，额，难度有点大…)，还是打印的foo。</p>
+<p>接着在Foo的方法foo前加上dynamic修饰，其他代码不变。可以发现，打印的都是foo。即加上dynamic修饰的方法无论是否通过Select方式调用该方法，都是走的消息机制。<br><img src="\images\Swift_MethodDispatch\Class_instace_method2.png" alt="">   </p>
+<p>接下来看看反汇编后，方法调用的指令(没加dynamic修饰)<br><img src="\images\Swift_MethodDispatch\Class_instace_method3.png" alt=""><br>可以看到编译后两者方法调用方式完全不同(同时也解释了上面demo中104的由来，当然一开始我是从16个字节开始8位8位的往上加试着来…有点蠢，但是通过objc_class源码知道vtable是一个结构体，vtable中的函数指针应该就直接存在类对象的内存结构中，不会在以一个指针指向vtable了)</p>
+<h3 id="类方法的调用"><a href="#类方法的调用" class="headerlink" title="类方法的调用"></a>类方法的调用</h3><h3 id="类扩展的方法调用"><a href="#类扩展的方法调用" class="headerlink" title="类扩展的方法调用"></a>类扩展的方法调用</h3>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Swift/" rel="tag"># Swift</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/27/Swift内存布局/" rel="next" title="Swift内存布局">
+                <i class="fa fa-chevron-left"></i> Swift内存布局
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="Tanner Jin" />
+            
+              <p class="site-author-name" itemprop="name">Tanner Jin</p>
+              <p class="site-description motion-element" itemprop="description">尘世间一迷途小码农</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/Jintao1997" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/p/1005055237152442/home?from=page_100505&mod=TAB&is_hot=1#place" target="_blank" title="Weibo">
+                      
+                        <i class="fa fa-fw fa-Weibo"></i>Weibo</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Class中的方法调用"><span class="nav-number">1.</span> <span class="nav-text">Class中的方法调用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#实例方法的调用"><span class="nav-number">1.1.</span> <span class="nav-text">实例方法的调用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#类方法的调用"><span class="nav-number">1.2.</span> <span class="nav-text">类方法的调用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#类扩展的方法调用"><span class="nav-number">1.3.</span> <span class="nav-text">类扩展的方法调用</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tanner Jin</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
