@@ -324,7 +324,7 @@
         
           <p><a href="https://lists.swift.org/pipermail/swift-evolution/Week-of-Mon-20151207/001922.html" target="_blank" rel="noopener">参考链接</a></p>
 <p>阅读本文前，可以先参考<a href="https://jintao1997.github.io/2018/12/27/Swift%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80/" target="_blank" rel="noopener">Swift内存布局</a></p>
-<p>编译型程序的方法调用有三种方式，第一种是直接调用，运行时寄存器通过call指令直接跳转至函数的具体实现。第二种通过虚函数表的方式，通过计算出函数指针在虚函数表中偏移量，得到函数指针，在通过call指令跳转到函数指针指向的内存地址，执行函数。第三种是消息机制，在Objective-C或者Swift(部分方法调用)中通过call objc_msgSend，在执行objc _ msgSend方法时，找到参数类对象(objc_ class)中method__list真正函数实现的指针(IMP)，在跳转至函数指针指向的内存执行具体的函数，当然没找到函数指针，会去父类中找，最后在NSObject类对象中没有找到函数指针，还会进行消息转发。</p>
+<p>编译型程序的方法调用有三种方式，第一种是直接派发(静态调度)，运行时寄存器通过call指令直接跳转至函数指针指向的具体实现地址。第二种通过虚函数表的方式，通过计算出函数指针在虚函数表中偏移量，得到函数指针，在通过call指令跳转到函数指针指向的内存地址，执行函数。第三种是消息机制，在Objective-C或者Swift(部分方法调用)中通过call objc_msgSend，在执行objc _ msgSend方法时，找到参数类对象(objc_ class)中method__list真正函数实现的指针(IMP)，在跳转至函数指针指向的内存执行具体的函数，当然没找到函数指针，会去父类中找，最后在NSObject类对象中没有找到函数指针，还会进行消息转发。</p>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2019/01/06/Swift方法调用/#more" rel="contents">
