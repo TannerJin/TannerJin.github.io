@@ -79,13 +79,13 @@
 
 
 
-<meta name="description" content="参考链接 阅读本文前，可以先参考Swift内存布局 编译型程序的方法调用有三种方式，第一种是直接派发(静态调度)，运行时寄存器通过call指令直接跳转至函数指针指向的具体实现地址。第二种通过虚函数表的方式，通过计算出函数指针在虚函数表中偏移量，得到函数指针，在通过call指令跳转到函数指针指向的内存地址，执行函数。第三种是消息机制，在Objective-C或者Swift(部分方法调用)中通过cal">
+<meta name="description" content="参考链接 阅读本文前，可以先参考Swift内存布局 编译型程序的方法调用有三种方式，第一种是直接派发(静态调度)，运行时寄存器通过call指令直接跳转至函数指针指向的具体实现地址。第二种通过虚函数表的方式，通过计算出函数指针在虚函数表中偏移量，得到函数指针，在通过call指令跳转到函数指针指向的内存地址，执行函数。第三种是动态调度，在Objective-C或者Swift(部分方法调用)中通过cal">
 <meta name="keywords" content="Swift">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Swift方法调用">
 <meta property="og:url" content="http://yoursite.com/2019/01/06/Swift方法调用/index.html">
 <meta property="og:site_name" content="Tanner Jin">
-<meta property="og:description" content="参考链接 阅读本文前，可以先参考Swift内存布局 编译型程序的方法调用有三种方式，第一种是直接派发(静态调度)，运行时寄存器通过call指令直接跳转至函数指针指向的具体实现地址。第二种通过虚函数表的方式，通过计算出函数指针在虚函数表中偏移量，得到函数指针，在通过call指令跳转到函数指针指向的内存地址，执行函数。第三种是消息机制，在Objective-C或者Swift(部分方法调用)中通过cal">
+<meta property="og:description" content="参考链接 阅读本文前，可以先参考Swift内存布局 编译型程序的方法调用有三种方式，第一种是直接派发(静态调度)，运行时寄存器通过call指令直接跳转至函数指针指向的具体实现地址。第二种通过虚函数表的方式，通过计算出函数指针在虚函数表中偏移量，得到函数指针，在通过call指令跳转到函数指针指向的内存地址，执行函数。第三种是动态调度，在Objective-C或者Swift(部分方法调用)中通过cal">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://yoursite.com/images/Swift_MethodDispatch/Class_instace_method.png">
 <meta property="og:image" content="http://yoursite.com/images/Swift_MethodDispatch/Class_instace_method2.png">
@@ -95,10 +95,10 @@
 <meta property="og:image" content="http://yoursite.com/images/Swift_MethodDispatch/Class_class_method3.png">
 <meta property="og:image" content="http://yoursite.com/images/Swift_MethodDispatch/Protocol_method.png">
 <meta property="og:image" content="http://yoursite.com/images/Swift_MethodDispatch/Protocol_method2.png">
-<meta property="og:updated_time" content="2019-01-07T17:34:27.470Z">
+<meta property="og:updated_time" content="2019-01-08T00:29:53.451Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Swift方法调用">
-<meta name="twitter:description" content="参考链接 阅读本文前，可以先参考Swift内存布局 编译型程序的方法调用有三种方式，第一种是直接派发(静态调度)，运行时寄存器通过call指令直接跳转至函数指针指向的具体实现地址。第二种通过虚函数表的方式，通过计算出函数指针在虚函数表中偏移量，得到函数指针，在通过call指令跳转到函数指针指向的内存地址，执行函数。第三种是消息机制，在Objective-C或者Swift(部分方法调用)中通过cal">
+<meta name="twitter:description" content="参考链接 阅读本文前，可以先参考Swift内存布局 编译型程序的方法调用有三种方式，第一种是直接派发(静态调度)，运行时寄存器通过call指令直接跳转至函数指针指向的具体实现地址。第二种通过虚函数表的方式，通过计算出函数指针在虚函数表中偏移量，得到函数指针，在通过call指令跳转到函数指针指向的内存地址，执行函数。第三种是动态调度，在Objective-C或者Swift(部分方法调用)中通过cal">
 <meta name="twitter:image" content="http://yoursite.com/images/Swift_MethodDispatch/Class_instace_method.png">
 
 
@@ -331,7 +331,7 @@
       
         <p><a href="https://lists.swift.org/pipermail/swift-evolution/Week-of-Mon-20151207/001922.html" target="_blank" rel="noopener">参考链接</a></p>
 <p>阅读本文前，可以先参考<a href="https://jintao1997.github.io/2018/12/27/Swift%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80/" target="_blank" rel="noopener">Swift内存布局</a></p>
-<p>编译型程序的方法调用有三种方式，第一种是直接派发(静态调度)，运行时寄存器通过call指令直接跳转至函数指针指向的具体实现地址。第二种通过虚函数表的方式，通过计算出函数指针在虚函数表中偏移量，得到函数指针，在通过call指令跳转到函数指针指向的内存地址，执行函数。第三种是消息机制，在Objective-C或者Swift(部分方法调用)中通过call objc_msgSend，在执行objc _ msgSend方法时，找到参数类对象(objc_ class)中method__list真正函数实现的指针(IMP)，在跳转至函数指针指向的内存执行具体的函数，当然没找到函数指针，会去父类中找，最后在NSObject类对象中没有找到函数指针，还会进行消息转发。</p>
+<p>编译型程序的方法调用有三种方式，第一种是直接派发(静态调度)，运行时寄存器通过call指令直接跳转至函数指针指向的具体实现地址。第二种通过虚函数表的方式，通过计算出函数指针在虚函数表中偏移量，得到函数指针，在通过call指令跳转到函数指针指向的内存地址，执行函数。第三种是动态调度，在Objective-C或者Swift(部分方法调用)中通过call objc_msgSend实现消息机制，在执行objc _ msgSend方法时，找到参数类对象(objc_ class)中method__list真正函数实现的指针(IMP)，在跳转至函数指针指向的内存执行具体的函数，当然没找到函数指针，会去父类中找，最后在NSObject类对象中没有找到函数指针，还会进行消息转发。</p>
 <a id="more"></a>
 <p>我们都知道在Objective-C语言中，继承于NSObject类的实例方法或者类方法调用编译后都会通过objc_msgSend去找到具体的函数然后实现。而对于Swift，三种方法调用都存在。由于不是所有的数据结构都是Class(即编译后不会生成对应的objc _ class)，顾方法调用不都是消息机制。即使对于Class，由于Swift中虚函数表的存在以及编译的优化(方法加了@objc也不一定走消息机制)，方法调用方式也复杂不少</p>
 <p><strong>本文基于Swift4.2, Xcode10.0</strong> </p>
