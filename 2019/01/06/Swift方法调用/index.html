@@ -97,7 +97,7 @@
 <meta property="og:image" content="http://yoursite.com/images/Swift_MethodDispatch/Protocol_method2.png">
 <meta property="og:image" content="http://yoursite.com/images/Swift_MethodDispatch/Protocol_method3.png">
 <meta property="og:image" content="http://yoursite.com/images/Swift_MethodDispatch/Protocol_method4.png">
-<meta property="og:updated_time" content="2019-01-10T16:35:22.485Z">
+<meta property="og:updated_time" content="2019-01-10T16:45:12.460Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Swift方法调用">
 <meta name="twitter:description" content="参考链接 阅读本文前，可以先参考Swift内存布局 编译型程序的方法调用有三种方式，第一种是直接派发(静态调度)，运行时寄存器通过call指令直接跳转至函数指针指向的具体实现地址。第二种通过虚函数表的方式，通过计算出函数指针在虚函数表中偏移量，得到函数指针，在通过call指令跳转到函数指针指向的内存地址，执行函数。第三种是动态调度，在Objective-C或者Swift(部分方法调用)中通过cal">
@@ -337,7 +337,8 @@
 <a id="more"></a>
 <p>我们都知道在Objective-C语言中，继承于NSObject类的实例方法或者类方法调用编译后都会通过objc_msgSend去找到具体的函数然后实现。而对于Swift，三种方法调用都存在。由于不是所有的数据结构都是Class(即编译后不会生成对应的objc _ class)，顾方法调用不都是消息机制。即使对于Class，由于Swift中虚函数表的存在以及编译的优化(方法加了@objc也不一定走消息机制)，方法调用方式也复杂不少</p>
 <p><strong>本文基于Swift4.2, Xcode10.0</strong> </p>
-<h2 id="Class"><a href="#Class" class="headerlink" title="Class"></a>Class</h2><h3 id="实例方法的调用"><a href="#实例方法的调用" class="headerlink" title="实例方法的调用"></a>实例方法的调用</h3><p>对于没加@objc的实例方法，编译后在类对象中的vtable以指针的方式指向该函数的具体实现。<br>而对于加了@objc的实例方法，编译后该方法函数指针会在vtable中存在，而且还会以指针的形式在类对象中的method_list中存在。   </p>
+<h2 id="Class"><a href="#Class" class="headerlink" title="Class"></a>Class</h2><h3 id="实例方法的调用"><a href="#实例方法的调用" class="headerlink" title="实例方法的调用"></a>实例方法的调用</h3><p>编译后函数存在的方式:<br>对于没加@objc的实例方法，编译后在类对象中的vtable以指针的方式指向该函数的具体实现。<br>而对于加了@objc的实例方法，编译后该方法函数指针会在vtable中存在，而且还会以指针的形式在类对象中的method_list中存在。   </p>
+<p>调用:   </p>
 <ul>
 <li>对于没加@objc的方法，只能通过虚函数表方式实现具体方法。   </li>
 <li>而对于加了@objc的方法，由于Swift的编译优化，没有通过Selector调用的方法，编译后还是会走虚函数表的机制。而通过Selector调用的方法，编译后会走消息机制。当然还有一个编译参数dynamic，对于dynamic修饰的方法，编译后不管是否通过Selector调用都会走消息机制。</li>
