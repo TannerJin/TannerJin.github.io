@@ -112,7 +112,7 @@
 <meta property="og:image" content="http://yoursite.com/images/Swift_memoryLayout/associative1.png">
 <meta property="og:image" content="http://yoursite.com/images/Swift_memoryLayout/associative2.png">
 <meta property="og:image" content="http://yoursite.com/images/Swift_memoryLayout/isa_exchange.png">
-<meta property="og:updated_time" content="2019-01-11T09:12:12.888Z">
+<meta property="og:updated_time" content="2019-01-13T06:30:33.493Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Swift内存布局">
 <meta name="twitter:description" content="参考链接1参考链接2 ps:本文所有测试基于64位计算机由于计算机内部是小端读取内存的(因此都是向后读取内存)本文基于Swift4.2, Xcode10.0">
@@ -349,7 +349,6 @@
         <p><a href="https://www.youtube.com/watch?v=ERYNyrfXjlg&amp;t=498s" target="_blank" rel="noopener">参考链接1</a><br><a href="https://academy.realm.io/posts/goto-mike-ash-exploring-swift-memory-layout/" target="_blank" rel="noopener">参考链接2</a></p>
 <p><strong>ps:</strong><br><strong>本文所有测试基于64位计算机</strong><br><strong>由于计算机内部是小端读取内存的(因此都是向后读取内存)</strong><br><strong>本文基于Swift4.2, Xcode10.0</strong></p>
  <a id="more"></a> 
-<p> <strong>必看: 讨论中的所有demo测试(替换函数指针)都是运行在Intel架构机器(即Mac)，因为arm64e架构引入了指针验证码（PAC）来检测和防止对内存中指针的意外更改</strong></p>
  <figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">MemoryLayout</span>&lt;<span class="type">T</span>&gt;.size      <span class="comment">// 类型T需要的内存大小</span></span><br><span class="line"><span class="type">MemoryLayout</span>&lt;<span class="type">T</span>&gt;.<span class="built_in">stride</span>    <span class="comment">// 类型T实际分配的内存大小(由于内存对齐原则，会多出空白的空间)</span></span><br><span class="line"><span class="type">MemoryLayout</span>&lt;<span class="type">T</span>&gt;.alignment  <span class="comment">// 内存对齐的基数</span></span><br></pre></td></tr></table></figure>
 <h3 id="Struct"><a href="#Struct" class="headerlink" title="Struct"></a>Struct</h3><p>struct的内存结构比较简单，和C以及C++的struct内存布局非常类似。   </p>
 <p>// 测试代码   </p>
