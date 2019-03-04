@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="Tanner Jin">
 <meta property="og:description" content="最近看同事朋友圈说阿里开源了一个协程框架，没听过协程的我一脸懵逼，但对于demo中的await实现的效果非常好奇。刚好最近在研究iOS如何实现子线程的异步的(主线程的异步是在主线程的while循环(runloop)中找到dispath中的异步的函数指针，然后执行的)，本来想将多线程和iOS的dispatch和runloop结合起来说下的，但同事”赶鸭子上架”了，我就先过一遍协程(主要是协程的awa">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-03-04T16:00:57.997Z">
+<meta property="og:updated_time" content="2019-03-04T16:12:08.916Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="coswift源码解读">
 <meta name="twitter:description" content="最近看同事朋友圈说阿里开源了一个协程框架，没听过协程的我一脸懵逼，但对于demo中的await实现的效果非常好奇。刚好最近在研究iOS如何实现子线程的异步的(主线程的异步是在主线程的while循环(runloop)中找到dispath中的异步的函数指针，然后执行的)，本来想将多线程和iOS的dispatch和runloop结合起来说下的，但同事”赶鸭子上架”了，我就先过一遍协程(主要是协程的awa">
@@ -334,7 +334,7 @@
 </li>
 <li><p>执行main协程的coroutine_ resume_ im，刚开始的main协程status是Ready状态，在该方法中通过coroutine_ getcontext方法将当前的线程寄存器的值设置到main协程的pre_ context中，然后通过coroutine_ begin方法设置当前线程寄存器的值为main协程的context。(其中的rip寄存器是CPU执行的入口点，即main协程的coroutine_ main函数指针)</p>
 </li>
-<li><p>开始执行main协程的entry，在该方法中，找到scheduler的Coroutine queue的head，即child Coroutine，然后执行child Coroutine的coroutine_ resume_ im方法(参考步骤2)，这时child Coroutine的pre_ context是main协程的函数执行状态。当前线程的寄存器值为child Coroutine的context。这时候开始执行child Coroutine的entry方法，即demo中的co_ lauch后面的block函数指针。</p>
+<li><p>开始执行main协程的entry(coroutine _ scheduler_ main方法)，在该方法中，找到scheduler的Coroutine queue的head，即child Coroutine，然后执行child Coroutine的coroutine_ resume_ im方法(参考步骤2)，这时child Coroutine的pre_ context是main协程的函数执行状态。当前线程的寄存器值为child Coroutine的context。这时候开始执行child Coroutine的entry方法，即demo中的co_ lauch后面的block函数指针。</p>
 </li>
 <li><p>接着调用了await方法，上面源码给出了实现。在await方法中，调用了promise.then方法，这个方法是异步的，即切换到其他线程执行网络，IO操作，接着执行了chan.receive()方法。</p>
 </li>
