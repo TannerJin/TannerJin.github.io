@@ -112,7 +112,7 @@
 <meta property="og:image" content="http://yoursite.com/images/Swift_memoryLayout/associative1.png">
 <meta property="og:image" content="http://yoursite.com/images/Swift_memoryLayout/associative2.png">
 <meta property="og:image" content="http://yoursite.com/images/Swift_memoryLayout/isa_exchange.png">
-<meta property="og:updated_time" content="2019-01-31T06:19:28.888Z">
+<meta property="og:updated_time" content="2019-02-28T02:07:32.326Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Swift内存布局">
 <meta name="twitter:description" content="参考链接1参考链接2 ps:本文所有测试基于64位计算机由于计算机内部是小端读取内存的(因此都是向后读取内存)本文基于Swift4.2, Xcode10.0">
@@ -368,7 +368,7 @@
     let arr = [&quot;Tanner&quot;, &quot;Jin&quot;]</code></p>
 <p>arr内存结构图(前面的字节值是指向数组内存地址的指针)<br><img src="\images\Swift_memoryLayout\struct_arr_pointer.png" alt=""><br>输入指针，跳转到数组内存地址   </p>
 <p>[“Tanner”, “Jin”]数组真正的内存结构图<br><img src="\images\Swift_memoryLayout\struct_arr.png" alt=""></p>
-<p>可以看到元素Tanner以及Jin在40个字节之后。至于这个40个字节(元素是String类型占用40bytes, 元素是Int类型，占用32bytes)是储存什么信息的？还在研究中。。。   </p>
+<p>可以看到元素Tanner以及Jin在40个字节之后。至于这个40个字节(元素是String类型占用40bytes, 元素是Int类型，占用32bytes)是储存什么信息的？  </p>
 <h3 id="Protocol"><a href="#Protocol" class="headerlink" title="Protocol"></a><strong>Protocol</strong></h3><h4 id="Pure-Protocol"><a href="#Pure-Protocol" class="headerlink" title="Pure Protocol"></a>Pure Protocol</h4><p>// 测试代码</p>
 <figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">protocol</span> <span class="title">Foo</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">foo</span> <span class="params">()</span></span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">A</span>: <span class="title">Foo</span> </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> name: <span class="type">String</span></span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">foo</span><span class="params">()</span></span> &#123;</span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> a: <span class="type">A</span> = <span class="type">A</span>(name: <span class="string">"Tanner"</span>)</span><br><span class="line"><span class="keyword">var</span> foo: <span class="type">Foo</span> = <span class="type">A</span>(name: <span class="string">"Jin"</span>)</span><br><span class="line"><span class="keyword">let</span> foo2: <span class="type">Foo</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> aPointer = <span class="built_in">withUnsafeMutablePointer</span>(to: &amp;a) &#123; (pointer) -&gt; <span class="type">UnsafeMutablePointer</span>&lt;<span class="type">A</span>&gt; <span class="keyword">in</span></span><br><span class="line">    <span class="keyword">return</span> pointer</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">let</span> fooPointer = <span class="built_in">withUnsafeMutablePointer</span>(to: &amp;foo) &#123; (pointer) -&gt; <span class="type">UnsafeMutablePointer</span>&lt;<span class="type">Foo</span>&gt; <span class="keyword">in</span></span><br><span class="line">    <span class="keyword">return</span> pointer</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="type">MemoryLayout</span>.size(ofValue: a))</span><br><span class="line"><span class="built_in">print</span>(<span class="type">MemoryLayout</span>.size(ofValue: foo))</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">"==="</span>)</span><br></pre></td></tr></table></figure>
 <p>结果图如下<br><img src="\images\Swift_memoryLayout\protocol.png" alt=""><br>可以看到协议的类型占用40个字节，但对于继承协议的结构体A是根据自身属性来分配内存大小，和之前分析的结构体内存结构一致。可以注意看，foo2有一个witness_ tables属性的指针，指向的就是协议Foo的witness_table(类型于C++的vtable), witness _ table的具体分析可以看我的下篇文章<a href="https://jintao1997.github.io/2019/01/06/Swift%E6%96%B9%E6%B3%95%E8%B0%83%E7%94%A8/" target="_blank" rel="noopener">Swift方法调用</a>. </p>
@@ -575,7 +575,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-count">13</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -597,7 +597,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-count">9</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
