@@ -82,14 +82,14 @@
 <meta name="description" content="最近看同事朋友圈说阿里开源了一个协程框架，没听过协程的我一脸懵逼，但对于demo中的await实现的效果非常好奇。刚好最近在研究iOS如何实现子线程的异步的(主线程的异步是在主线程的while循环(runloop)中找到dispath中的异步的函数指针，然后执行的)，本来想将多线程和iOS的dispatch和runloop结合起来说下的，但同事”赶鸭子上架”了，我就先过一遍协程(主要是协程的awa">
 <meta name="keywords" content="多线程,源码解读">
 <meta property="og:type" content="article">
-<meta property="og:title" content="coswift原理解读">
+<meta property="og:title" content="coswift原理分析">
 <meta property="og:url" content="http://yoursite.com/2019/03/04/coswift源码解读/index.html">
 <meta property="og:site_name" content="Tanner Jin">
 <meta property="og:description" content="最近看同事朋友圈说阿里开源了一个协程框架，没听过协程的我一脸懵逼，但对于demo中的await实现的效果非常好奇。刚好最近在研究iOS如何实现子线程的异步的(主线程的异步是在主线程的while循环(runloop)中找到dispath中的异步的函数指针，然后执行的)，本来想将多线程和iOS的dispatch和runloop结合起来说下的，但同事”赶鸭子上架”了，我就先过一遍协程(主要是协程的awa">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-03-05T05:13:06.808Z">
+<meta property="og:updated_time" content="2019-03-05T08:25:09.943Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="coswift原理解读">
+<meta name="twitter:title" content="coswift原理分析">
 <meta name="twitter:description" content="最近看同事朋友圈说阿里开源了一个协程框架，没听过协程的我一脸懵逼，但对于demo中的await实现的效果非常好奇。刚好最近在研究iOS如何实现子线程的异步的(主线程的异步是在主线程的while循环(runloop)中找到dispath中的异步的函数指针，然后执行的)，本来想将多线程和iOS的dispatch和runloop结合起来说下的，但同事”赶鸭子上架”了，我就先过一遍协程(主要是协程的awa">
 
 
@@ -126,7 +126,7 @@
 
 
 
-  <title>coswift原理解读 | Tanner Jin</title>
+  <title>coswift原理分析 | Tanner Jin</title>
   
 
 
@@ -270,7 +270,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">coswift原理解读</h1>
+          <h1 class="post-title" itemprop="name headline">coswift原理分析</h1>
         
 
         <div class="post-meta">
@@ -348,7 +348,7 @@
 </li>
 <li><p>接着异步线程回调回来了，上面源码显示执行了chan.send_nonblock方法。在这个方法中，最后执行了coroutine _add方法，此时会将child Coroutine重新设置回scheduler-&gt;Coroutine-&gt;queue的head, 并且会重新运行main协程，在main协程的循环中，又将child Coroutine取出，并且执行 coroutine _ resume _ im方法(参考步骤2)。不过这时候的child Coroutine的status为暂停状态，会走第二个case。这时候将main协程的运行状态寄存器值保存到child Coroutine的pre _ context中，然后将线程的寄存器值设置成child Coroutine之前运行状态。</p>
 </li>
-<li><p>接着就会运行demo中block中的switch result方法。然后child Coroutine的entry运行完，接着走到coroutine_ main的co-&gt;status = COROUTINE_DEAD方法，将child Coroutine状态设置成Dead,然后在将线程的寄存器状态切换回main Coroutine(child Coroutine-&gt;pre _ context)的运行状态。</p>
+<li><p>接着就会运行demo中block中的switch result方法。然后child Coroutine的entry运行完，接着走到coroutine_ main的co-&gt;status = COROUTINE_DEAD方法(别忘了，所有的协程都是从coroutine _main函数开始执行的)，将child Coroutine状态设置成Dead,然后在将线程的寄存器状态切换回main Coroutine(child Coroutine-&gt;pre _ context)的运行状态。</p>
 </li>
 <li><p>在main Coroutine的While循环过程中，没有child Coroutine了，又将线程的寄存器值切回了最开始没进入协程开始的时候(即current_ context)。</p>
 </li>
