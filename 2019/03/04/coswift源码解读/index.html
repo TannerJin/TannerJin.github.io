@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Swift,源码解读," />
+  <meta name="keywords" content="多线程,源码解读," />
 
 
 
@@ -80,16 +80,16 @@
 
 
 <meta name="description" content="最近看同事朋友圈说阿里开源了一个协程框架，没听过协程的我一脸懵逼，但对于demo中的await实现的效果非常好奇。刚好最近在研究iOS如何实现子线程的异步的(主线程的异步是在主线程的while循环(runloop)中找到dispath中的异步的函数指针，然后执行的)，本来想将多线程和iOS的dispatch和runloop结合起来说下的，但同事”赶鸭子上架”了，我就先过一遍协程(主要是协程的awa">
-<meta name="keywords" content="Swift,源码解读">
+<meta name="keywords" content="多线程,源码解读">
 <meta property="og:type" content="article">
-<meta property="og:title" content="coswift源码解读">
+<meta property="og:title" content="coswift原理解读">
 <meta property="og:url" content="http://yoursite.com/2019/03/04/coswift源码解读/index.html">
 <meta property="og:site_name" content="Tanner Jin">
 <meta property="og:description" content="最近看同事朋友圈说阿里开源了一个协程框架，没听过协程的我一脸懵逼，但对于demo中的await实现的效果非常好奇。刚好最近在研究iOS如何实现子线程的异步的(主线程的异步是在主线程的while循环(runloop)中找到dispath中的异步的函数指针，然后执行的)，本来想将多线程和iOS的dispatch和runloop结合起来说下的，但同事”赶鸭子上架”了，我就先过一遍协程(主要是协程的awa">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-03-04T17:00:40.435Z">
+<meta property="og:updated_time" content="2019-03-05T05:13:06.808Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="coswift源码解读">
+<meta name="twitter:title" content="coswift原理解读">
 <meta name="twitter:description" content="最近看同事朋友圈说阿里开源了一个协程框架，没听过协程的我一脸懵逼，但对于demo中的await实现的效果非常好奇。刚好最近在研究iOS如何实现子线程的异步的(主线程的异步是在主线程的while循环(runloop)中找到dispath中的异步的函数指针，然后执行的)，本来想将多线程和iOS的dispatch和runloop结合起来说下的，但同事”赶鸭子上架”了，我就先过一遍协程(主要是协程的awa">
 
 
@@ -126,7 +126,7 @@
 
 
 
-  <title>coswift源码解读 | Tanner Jin</title>
+  <title>coswift原理解读 | Tanner Jin</title>
   
 
 
@@ -270,7 +270,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">coswift源码解读</h1>
+          <h1 class="post-title" itemprop="name headline">coswift原理解读</h1>
         
 
         <div class="post-meta">
@@ -322,7 +322,7 @@
       
         <p>最近看同事朋友圈说阿里开源了一个协程框架，没听过协程的我一脸懵逼，但对于demo中的await实现的效果非常好奇。刚好最近在研究iOS如何实现子线程的异步的(主线程的异步是在主线程的while循环(runloop)中找到dispath中的异步的函数指针，然后执行的)，本来想将多线程和iOS的dispatch和runloop结合起来说下的，但同事”赶鸭子上架”了，我就先过一遍协程(主要是协程的await实现原理)。</p>
  <a id="more"></a> 
-<p>在分时操作系统中，线程的切换，往往会伴随着寄存器内容的切换(上下文的切换)</p>
+<p>在分时操作系统中，线程的切换，往往会伴随着寄存器内容的切换(上下文的切换)。而对于协程，在单线程内部自己实现了一套多任务机制，将单线程的任务分割成多个(协程)，通过设置当前线程的寄存器状态，达到单线程中多协程并发的效果。</p>
 <h3 id="设计"><a href="#设计" class="headerlink" title="设计"></a>设计</h3><h4 id="coroutine-scheduler-t"><a href="#coroutine-scheduler-t" class="headerlink" title="coroutine _scheduler _t"></a>coroutine _scheduler _t</h4><p>一个线程有一个coroutine_ scheduler_ t对象，通过pthread_setspecific设置(runloop对象也是喔，但是复杂些)。一个scheduler对象结构有一个main协程，有一个running协程，还有个链表(协程中套协程(同一线程))</p>
 <h4 id="coroutine-协程"><a href="#coroutine-协程" class="headerlink" title="coroutine(协程)"></a>coroutine(协程)</h4><p>entry: 函数执行入口<br>context: 当前协程运行中寄存器值(一个指向coroutine_ ucontext_ re类型的指针)<br>pre_context: 上一个协程运行时的寄存器值<br>status: 当前协程的状态</p>
 <h3 id="OK，直接一步一步分析源码吧"><a href="#OK，直接一步一步分析源码吧" class="headerlink" title="OK，直接一步一步分析源码吧"></a>OK，直接一步一步分析源码吧</h3><p>// 源码</p>
@@ -372,7 +372,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Swift/" rel="tag"># Swift</a>
+            <a href="/tags/多线程/" rel="tag"># 多线程</a>
           
             <a href="/tags/源码解读/" rel="tag"># 源码解读</a>
           
@@ -498,7 +498,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">10</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
