@@ -322,7 +322,7 @@
 
       
         
-          <p>最近看同事朋友圈说阿里开源了一个协程框架，没听过协程的我一脸懵逼，但对于demo中的await实现的效果非常好奇。刚好最近在研究iOS如何实现子线程的异步的(主线程的异步是在主线程的while循环(runloop)中找到dispath中的异步的函数指针，然后执行的)，本来想将多线程和iOS的dispatch和runloop结合起来说下的，但同事”赶鸭子上架”了，我就先过一遍协程(主要是协程的await实现原理)。</p>
+          <p>最近看同事朋友圈说阿里开源了一个协程框架，没听过协程的我一脸懵逼，但对于demo中的await实现的效果非常好奇。刚好最近在研究iOS如何实现子线程的异步的(主线程的异步是在主线程的while循环(runloop)中找自己线程的dispatch的queue中的任务执行)，本来想将多线程和iOS的dispatch和runloop结合起来说下的，但同事”赶鸭子上架”了，我就先过一遍协程(主要是协程的await实现原理)。</p>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2019/03/04/coswift源码解读/#more" rel="contents">
