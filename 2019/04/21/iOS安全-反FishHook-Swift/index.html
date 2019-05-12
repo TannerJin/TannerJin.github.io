@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="iOS逆向,iOS逆向学习笔记," />
+  <meta name="keywords" content="iOS逆向,iOS安全,Mach-O文件," />
 
 
 
@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="通过class-dump可以获取到App的头文件，而头文件又有一些属性以及方法等信息，通过这些信息以及界面调试能够大致猜出目的函数的位置。但是由于苹果商店的APP的代码被加密过，在运行时才会解密，因此需要将可执行文件先进行解密。">
-<meta name="keywords" content="iOS逆向,iOS逆向学习笔记">
+<meta name="description" content="出于安全考虑，只贴出代码，不分享思路，当然思路都在代码中。AntiFishHook">
+<meta name="keywords" content="iOS逆向,iOS安全,Mach-O文件">
 <meta property="og:type" content="article">
-<meta property="og:title" content="iOS逆向学习笔记(二) App解密与class-dump">
-<meta property="og:url" content="http://yoursite.com/2018/09/10/iOS逆向学习笔记-二-ipa解密-class-dump/index.html">
+<meta property="og:title" content="iOS安全-反FishHook(Swift)">
+<meta property="og:url" content="http://yoursite.com/2019/04/21/iOS安全-反FishHook-Swift/index.html">
 <meta property="og:site_name" content="Tanner Jin">
-<meta property="og:description" content="通过class-dump可以获取到App的头文件，而头文件又有一些属性以及方法等信息，通过这些信息以及界面调试能够大致猜出目的函数的位置。但是由于苹果商店的APP的代码被加密过，在运行时才会解密，因此需要将可执行文件先进行解密。">
+<meta property="og:description" content="出于安全考虑，只贴出代码，不分享思路，当然思路都在代码中。AntiFishHook">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-09-12T08:30:51.403Z">
+<meta property="og:updated_time" content="2019-05-12T03:57:00.989Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="iOS逆向学习笔记(二) App解密与class-dump">
-<meta name="twitter:description" content="通过class-dump可以获取到App的头文件，而头文件又有一些属性以及方法等信息，通过这些信息以及界面调试能够大致猜出目的函数的位置。但是由于苹果商店的APP的代码被加密过，在运行时才会解密，因此需要将可执行文件先进行解密。">
+<meta name="twitter:title" content="iOS安全-反FishHook(Swift)">
+<meta name="twitter:description" content="出于安全考虑，只贴出代码，不分享思路，当然思路都在代码中。AntiFishHook">
 
 
 
@@ -120,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/09/10/iOS逆向学习笔记-二-ipa解密-class-dump/"/>
+  <link rel="canonical" href="http://yoursite.com/2019/04/21/iOS安全-反FishHook-Swift/"/>
 
 
 
 
 
-  <title>iOS逆向学习笔记(二) App解密与class-dump | Tanner Jin</title>
+  <title>iOS安全-反FishHook(Swift) | Tanner Jin</title>
   
 
 
@@ -253,7 +253,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/10/iOS逆向学习笔记-二-ipa解密-class-dump/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/21/iOS安全-反FishHook-Swift/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Tanner Jin">
@@ -270,7 +270,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">iOS逆向学习笔记(二) App解密与class-dump</h1>
+          <h1 class="post-title" itemprop="name headline">iOS安全-反FishHook(Swift)</h1>
         
 
         <div class="post-meta">
@@ -282,8 +282,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-10T13:25:32+08:00">
-                2018-09-10
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-21T13:52:14+08:00">
+                2019-04-21
               </time>
             
 
@@ -342,38 +342,7 @@
       
 
       
-        <p>通过class-dump可以获取到App的头文件，而头文件又有一些属性以及方法等信息，通过这些信息以及界面调试能够大致猜出目的函数的位置。但是由于苹果商店的APP的代码被加密过，在运行时才会解密，因此需要将可执行文件先进行解密。<br><a id="more"></a> </p>
-<h2 id="App解密"><a href="#App解密" class="headerlink" title="App解密"></a>App解密</h2><ol>
-<li><p>通过<a href="https://github.com/stefanesser/dumpdecrypted" target="_blank" rel="noopener">dumpdecrypted</a>解密   </p>
-<ul>
-<li>make: git clone后在当前文件中执行make指令，会将源码编译生成一个dumpdecrypted.dylib动态库。通过该动态库进行解密APP的二进制文件。   </li>
-<li><p>主要命令：     </p>
-<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">DYLD_INSERT_LIBRARIES</span>=dumpdecrypted.dylib executableFile</span><br></pre></td></tr></table></figure>
-<p>DYLD_INSERT_LIBRARIES是一个环境变量，可以让executableFile在启动时，在dyld加载动态库时，通过DYLD_INSERT_LIBRARIES环境变量来加载指定的动态库(dumpdecrypted.dylib),即可达到运行时解密目的~   </p>
-</li>
-<li><p>具体操作：<br>(1) 将dumpdecrypted.dylib复制到手机中，书上建议复制到APP的沙盒目录的Document目录下。(我试了下放到APP可执行文件同目录下也可以，不过在解密后，生成的解密文件也是在沙盒目录的Document目录下，且dumpdecrypted.dylib也会在Document目录下被复制一份) </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 复制到手机命令(也可以通过工具iFunBox)    </span><br><span class="line">scp -P 2222 root@localhost:/.../Document /.../dumpdecrypted.dylib</span><br></pre></td></tr></table></figure>
-<p>(2) 在Document目录下执行DYLD_INSERT_LIBRARIES=dumpdecrypted.dylib executableFile命令得到APP.decrypted文件。<br>(3) 将APP.decrypted文件拷贝到电脑中，命令参考第一步</p>
-</li>
-</ul>
-</li>
-<li><p>通过<a href="https://github.com/AloneMonkey/frida-ios-dump" target="_blank" rel="noopener">frida-iOS-dump</a>(该工具由本书作者提供)解密</p>
-<ul>
-<li>安装:<br>先安装python的pip工具<br>手机越狱商店安装frida<br>Mac在该工具目录下执行sudo pip install -r requirements.txt –upgrade   </li>
-<li>使用:<br>先通过ssh连接到手机，再在该项目目录下执行 ./dump.py appName or appBundleId<br>得到解密的IPA文件</li>
-</ul>
-</li>
-<li>通过<a href="https://github.com/KJCracks/Clutch" target="_blank" rel="noopener">clutch</a>解密<br> (这个具体没用过，也没试过，看书吧。。。而且作者说用这个会经常报错，不推荐这个~)</li>
-</ol>
-<h2 id="class-dump"><a href="#class-dump" class="headerlink" title="class-dump"></a>class-dump</h2><ul>
-<li>目的:<br>得到App的头文件   </li>
-<li><p>安装:<br><a href="http://stevenygard.com/projects/class-dump" target="_blank" rel="noopener">下载地址</a><br>将class-dump复制到/usr/bin后, 给class-dump赋予执行权限(sudo chmod 777)   </p>
-</li>
-<li><p>使用:<br>执行命令class-dump –arch arm64 targetApp -H -o outputDir</p>
-</li>
-<li><p>原理(<a href="https://github.com/nygard/class-dump" target="_blank" rel="noopener">class-dump源码</a>):<br>通过分析iOS可执行文件或者dylib，即Mach-O文件(通过<a href="https://github.com/gdbinit/MachOView" target="_blank" rel="noopener">MachOView</a>工具可以查看Mach-O文件结构)，通过Mach-O文件的Section信息可以得到类以及方法等数据的信息，具体怎么解析出来的，请看书或者阅读源码~</p>
-</li>
-</ul>
+        <p>出于安全考虑，只贴出代码，不分享思路，当然思路都在代码中。<br><a href="https://github.com/TannerJin/anti-fishhook" target="_blank" rel="noopener">AntiFishHook</a></p>
 
       
     </div>
@@ -393,7 +362,9 @@
           
             <a href="/tags/iOS逆向/" rel="tag"># iOS逆向</a>
           
-            <a href="/tags/iOS逆向学习笔记/" rel="tag"># iOS逆向学习笔记</a>
+            <a href="/tags/iOS安全/" rel="tag"># iOS安全</a>
+          
+            <a href="/tags/Mach-O文件/" rel="tag"># Mach-O文件</a>
           
         </div>
       
@@ -406,8 +377,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/09/09/iOS逆向学习笔记-一-界面分析/" rel="next" title="iOS逆向学习笔记(一) 界面分析">
-                <i class="fa fa-chevron-left"></i> iOS逆向学习笔记(一) 界面分析
+              <a href="/2019/03/04/coswift源码解读/" rel="next" title="coswift原理分析">
+                <i class="fa fa-chevron-left"></i> coswift原理分析
               </a>
             
           </div>
@@ -415,10 +386,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/09/12/iOS逆向学习笔记-三-静态分析/" rel="prev" title="iOS逆向学习笔记(三) 静态分析">
-                iOS逆向学习笔记(三) 静态分析 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -470,17 +437,8 @@
       
 
       
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
-            文章目录
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
-            站点概览
-          </li>
-        </ul>
-      
 
-      <section class="site-overview-wrap sidebar-panel">
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -560,22 +518,6 @@
         </div>
       </section>
 
-      
-      <!--noindex-->
-        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-
-            
-              
-            
-
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#App解密"><span class="nav-number">1.</span> <span class="nav-text">App解密</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#class-dump"><span class="nav-number">2.</span> <span class="nav-text">class-dump</span></a></li></ol></div>
-            
-
-          </div>
-        </section>
-      <!--/noindex-->
       
 
       
