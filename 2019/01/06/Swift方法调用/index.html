@@ -97,7 +97,7 @@
 <meta property="og:image" content="http://yoursite.com/images/Swift_MethodDispatch/Protocol_method2.png">
 <meta property="og:image" content="http://yoursite.com/images/Swift_MethodDispatch/Protocol_method3.png">
 <meta property="og:image" content="http://yoursite.com/images/Swift_MethodDispatch/Protocol_method4.png">
-<meta property="og:updated_time" content="2019-04-10T09:02:25.756Z">
+<meta property="og:updated_time" content="2019-06-06T09:06:58.939Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Swift方法调用">
 <meta name="twitter:description" content="参考链接 阅读本文前，可以先参考Swift内存布局 本文基于Swift4.2, Xcode10.0  必看:本例的函数指针的替换千万别用在正式项目中，只是用来验证方法的调用方式，具体函数指针在数据结构内存(Vtable和witness_table)的偏移值会在不同的编译器或者语言版本而有不同 编译型程序的方法调用有三种方式，第一种是直接派发(静态调度)，运行时寄存器通过call指令直接跳转至代码的">
@@ -351,7 +351,7 @@
 <p>接下来看看反汇编后，方法调用的指令(没加dynamic修饰)<br><img src="\images\Swift_MethodDispatch\Class_instace_method3.png" alt=""><br>可以看到编译后两者方法调用方式完全不同(同时也解释了上面demo中104的由来，当然一开始我是从16个字节开始8位8位的往上加试着来…有点蠢(当然我当时通过Xcode的view Memory数出来Foo的objc _ class占用了170多个字节)，而且通过objc_class源码知道vtable是一个结构体，vtable中的函数指针应该就直接存在类对象的内存结构中，不会在以一个指针指向vtable了)</p>
 <h3 id="类方法的调用"><a href="#类方法的调用" class="headerlink" title="类方法的调用"></a>类方法的调用</h3><p>对于没有加@objc的类方法，在编译后，类方法<strong>不会</strong>以指针的形式被编译到vtable结构体中。而是直接储存在二进制的代码段中。在调用的地方，直接跳转至函数实现的地方。<br>对于加了@objc的类方法，编译后，会以函数指针的方式会添加到该类对应的元类的method_list中。通过Select调用，跳转至函数指针指向的地方。</p>
 <ul>
-<li>对于没有加@objc的类方法，是走的直接派发的方式(inline)。   </li>
+<li>对于没有加@objc的类方法，是走的直接派发的方式。   </li>
 <li>对于加了@objc的类方法，没有通过Selector方式调用，是直接派发的方式调用函数。而通过Selector方式调用函数，走的是消息机制(去元类中的method_list中找方法)。对于dynamic修饰的类方法，无论是否通过Selector方式调用，都走的消息机制。</li>
 </ul>
 <p>下面举个demo看下结论是否正确，由于类方法不储存在虚函数表中，因此不能像上面通过替换虚函数表中的函数指针的方式替换类方法(当然替换该方法符号指针，也能替换方法，可以参考MSHookFunction实现原理)。</p>
