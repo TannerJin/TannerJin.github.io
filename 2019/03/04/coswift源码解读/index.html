@@ -79,19 +79,19 @@
 
 
 
-<meta name="description" content="最近看同事朋友圈说阿里开源了一个协程框架，没听过协程的我一脸懵逼，但对于demo中的await实现的效果非常好奇。刚好最近在研究iOS如何实现子线程的异步的(主线程的异步是在主线程的while循环(runloop)中找自己线程的dispatch的queue中的任务执行)，本来想将多线程和iOS的dispatch和runloop结合起来说下的，但同事”赶鸭子上架”了，我就先过一遍协程(主要是协程的a">
+<meta name="description" content="最近看同事朋友圈说阿里开源了一个协程框架，没听过协程的我一脸懵逼，但对于demo中的await实现的效果非常好奇。我就看了下协程的源码(主要是协程的await实现原理)。">
 <meta name="keywords" content="多线程,源码解读">
 <meta property="og:type" content="article">
 <meta property="og:title" content="coswift原理分析">
 <meta property="og:url" content="http://yoursite.com/2019/03/04/coswift源码解读/index.html">
 <meta property="og:site_name" content="Tanner Jin">
-<meta property="og:description" content="最近看同事朋友圈说阿里开源了一个协程框架，没听过协程的我一脸懵逼，但对于demo中的await实现的效果非常好奇。刚好最近在研究iOS如何实现子线程的异步的(主线程的异步是在主线程的while循环(runloop)中找自己线程的dispatch的queue中的任务执行)，本来想将多线程和iOS的dispatch和runloop结合起来说下的，但同事”赶鸭子上架”了，我就先过一遍协程(主要是协程的a">
+<meta property="og:description" content="最近看同事朋友圈说阿里开源了一个协程框架，没听过协程的我一脸懵逼，但对于demo中的await实现的效果非常好奇。我就看了下协程的源码(主要是协程的await实现原理)。">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://yoursite.com/images/coswift.png">
-<meta property="og:updated_time" content="2019-04-11T14:04:06.032Z">
+<meta property="og:updated_time" content="2019-08-30T06:30:32.339Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="coswift原理分析">
-<meta name="twitter:description" content="最近看同事朋友圈说阿里开源了一个协程框架，没听过协程的我一脸懵逼，但对于demo中的await实现的效果非常好奇。刚好最近在研究iOS如何实现子线程的异步的(主线程的异步是在主线程的while循环(runloop)中找自己线程的dispatch的queue中的任务执行)，本来想将多线程和iOS的dispatch和runloop结合起来说下的，但同事”赶鸭子上架”了，我就先过一遍协程(主要是协程的a">
+<meta name="twitter:description" content="最近看同事朋友圈说阿里开源了一个协程框架，没听过协程的我一脸懵逼，但对于demo中的await实现的效果非常好奇。我就看了下协程的源码(主要是协程的await实现原理)。">
 <meta name="twitter:image" content="http://yoursite.com/images/coswift.png">
 
 
@@ -322,9 +322,9 @@
       
 
       
-        <p>最近看同事朋友圈说阿里开源了一个协程框架，没听过协程的我一脸懵逼，但对于demo中的await实现的效果非常好奇。刚好最近在研究iOS如何实现子线程的异步的(主线程的异步是在主线程的while循环(runloop)中找自己线程的dispatch的queue中的任务执行)，本来想将多线程和iOS的dispatch和runloop结合起来说下的，但同事”赶鸭子上架”了，我就先过一遍协程(主要是协程的await实现原理)。</p>
+        <p>最近看同事朋友圈说阿里开源了一个协程框架，没听过协程的我一脸懵逼，但对于demo中的await实现的效果非常好奇。我就看了下协程的源码(主要是协程的await实现原理)。</p>
  <a id="more"></a> 
-<p>在分时操作系统中(单核)，线程的切换，往往会伴随着寄存器内容的切换(上下文的切换)，上下文的切换，当前CPU执行的任务也就改变了。而对于协程，在单线程内部自己实现了一套多任务机制，将单线程的任务分割成多个(协程)，通过设置当前线程的寄存器状态，达到单线程中多协程并发的效果。</p>
+<p>在分时操作系统中(单核)，线程的切换，往往会伴随着寄存器内容的切换(上下文的切换)，上下文的切换，当前CPU执行的任务也就改变了。而对于协程，在单线程内部自己实现了一套多任务机制，将单线程的任务分割成多个(协程)，通过切换当前线程的寄存器状态，达到单线程中多协程并发的效果。</p>
 <h3 id="设计"><a href="#设计" class="headerlink" title="设计"></a>设计</h3><h4 id="coroutine-scheduler-t"><a href="#coroutine-scheduler-t" class="headerlink" title="coroutine _scheduler _t"></a>coroutine _scheduler _t</h4><p>一个线程有一个coroutine_ scheduler_ t对象，通过pthread_setspecific设置(runloop对象也是喔，但是复杂些)。一个scheduler对象结构有一个main协程，有一个running协程, 还有个协程队列coroutine _queue，这个queue的设计有点类似libdispatch的queue的设计，只保存着第一个和最后一个协程(任务)。</p>
 <h4 id="coroutine-协程"><a href="#coroutine-协程" class="headerlink" title="coroutine(协程)"></a>coroutine(协程)</h4><p>entry: 函数执行入口<br>context: 当前协程运行中寄存器值(一个指向coroutine_ ucontext_ re类型的指针)<br>pre_context: 上一个协程运行时的寄存器值<br>status: 当前协程的状态</p>
 <h4 id="核心汇编代码的目的-参数就一个，是x0，void指针-coroutine-ucontext-t结构"><a href="#核心汇编代码的目的-参数就一个，是x0，void指针-coroutine-ucontext-t结构" class="headerlink" title="核心汇编代码的目的(参数就一个，是x0，void指针, coroutine _ucontext _t结构)"></a>核心汇编代码的目的(参数就一个，是x0，void指针, coroutine _ucontext _t结构)</h4><p>x0: (某个协程的context或者pre _context)   </p>
@@ -334,13 +334,13 @@
 <p>// demo</p>
 <figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">co_launch &#123;</span><br><span class="line">    <span class="keyword">let</span> result = <span class="keyword">try</span> await &#123;</span><br><span class="line">        co_fetchSomethingAsynchronous()</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">switch</span> result &#123;</span><br><span class="line">    <span class="keyword">case</span> .fulfilled(<span class="keyword">let</span> data):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">"data: <span class="subst">\(data)</span>"</span>)</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">    <span class="keyword">case</span> .rejected(<span class="keyword">let</span> error):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">"error: <span class="subst">\(error)</span>"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p><strong>在demo中一共有三个上下文，context(即在一个线程中有3个寄存器状态)</strong></p>
-<p>current_ context: 当前线程运行寄存器状态<br>main_ Coroutine _ context: 主协程运行寄存器状态<br>child_ Coroutine _ context: demo中block里运行时的寄存器状态</p>
+<p>current_ context: 当前线程运行寄存器状态(没进入协程的状态)<br>main_ Coroutine _ context: 主协程运行寄存器状态(这个状态的任务主要用于调度协程)<br>child_ Coroutine _ context: demo中block里运行时的寄存器状态(子任务状态)</p>
 <p>关系如下</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">child_ Coroutine _ context -&gt; pre_context = main _ Coroutine _ context -&gt; pre_context = current_ context</span><br></pre></td></tr></table></figure>
 <h4 id="demo开始分析"><a href="#demo开始分析" class="headerlink" title="demo开始分析"></a>demo开始分析</h4><ol>
 <li><p>在开启一个co_launch后，创建了一个scheduler对象，还有一个main Coroutine，和上面源码中实例化的那个Coroutine(child Coroutine)。将child Coroutine和main Coroutine串起来(scheduler的_queue, 一个在头，一个在尾)。child Coroutine是真正的任务(demo中的block)，main Coroutine开启了while循环，会一直找scheduler的Coroutine queue的head的Coroutine执行.</p>
 </li>
-<li><p>执行main协程的coroutine_ resume_ im，刚开始的main协程status是Ready状态，在该方法中通过coroutine_ getcontext方法将当前的线程寄存器的值设置到main协程的pre_ context中，然后通过coroutine_ begin方法设置当前线程寄存器的值为main协程的context。(其中的pc寄存器值是CPU下一个运行指令的地址(arm64)，即main协程的coroutine_ main函数指针)</p>
+<li><p>执行main协程的coroutine_ resume_ im，刚开始的main协程status是Ready状态，在该方法中通过coroutine_ getcontext方法将当前的线程寄存器的值设置到main协程的pre_ context中，然后通过coroutine_ begin方法设置当前线程寄存器的值为main协程的context。(函数入口，函数参数，栈地址rbp和rsp等等)</p>
 </li>
 <li><p>开始执行main协程的entry(coroutine _ scheduler_ main方法)，在该方法中，找到scheduler的Coroutine queue的head，即child Coroutine，然后执行child Coroutine的coroutine_ resume_ im方法(参考步骤2)，这时child Coroutine的pre_ context是main协程的函数执行状态。当前线程的寄存器值为child Coroutine的context。这时候开始执行child Coroutine的entry方法，即demo中的co_ lauch后面的block函数指针。</p>
 </li>
@@ -484,7 +484,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-count">13</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

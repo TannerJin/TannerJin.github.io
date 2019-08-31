@@ -79,12 +79,12 @@
 
 
 
-<meta name="description" content="去年毕业到现在刚好工作一年了(离我第一篇博客刚好也一年时间了)，趁着这篇博客将自己根据学校的知识和实际开发的经验生成的知识体系简单的梳理一遍吧    前言本文会根据某些小demo，来扯出一些平时开发欠缺的知识点">
+<meta name="description" content="去年毕业到现在刚好工作一年了(离我第一篇博客刚好也一年时间了)，聊一些之后学习的方向吧">
 <meta property="og:type" content="article">
 <meta property="og:title" content="工作一年杂谈">
 <meta property="og:url" content="http://yoursite.com/2019/06/23/工作一年杂谈/index.html">
 <meta property="og:site_name" content="Tanner Jin">
-<meta property="og:description" content="去年毕业到现在刚好工作一年了(离我第一篇博客刚好也一年时间了)，趁着这篇博客将自己根据学校的知识和实际开发的经验生成的知识体系简单的梳理一遍吧    前言本文会根据某些小demo，来扯出一些平时开发欠缺的知识点">
+<meta property="og:description" content="去年毕业到现在刚好工作一年了(离我第一篇博客刚好也一年时间了)，聊一些之后学习的方向吧">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://yoursite.com/images/Summary/Swift_Setter.png">
 <meta property="og:image" content="http://yoursite.com/images/Summary/Swift-llvm.png">
@@ -93,10 +93,10 @@
 <meta property="og:image" content="http://yoursite.com/images/Summary/mach-o_load.png">
 <meta property="og:image" content="http://yoursite.com/images/Summary/xun_proc.png">
 <meta property="og:image" content="http://yoursite.com/images/Summary/xun_proc_stat.png">
-<meta property="og:updated_time" content="2019-07-31T08:09:18.967Z">
+<meta property="og:updated_time" content="2019-08-31T08:33:12.123Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="工作一年杂谈">
-<meta name="twitter:description" content="去年毕业到现在刚好工作一年了(离我第一篇博客刚好也一年时间了)，趁着这篇博客将自己根据学校的知识和实际开发的经验生成的知识体系简单的梳理一遍吧    前言本文会根据某些小demo，来扯出一些平时开发欠缺的知识点">
+<meta name="twitter:description" content="去年毕业到现在刚好工作一年了(离我第一篇博客刚好也一年时间了)，聊一些之后学习的方向吧">
 <meta name="twitter:image" content="http://yoursite.com/images/Summary/Swift_Setter.png">
 
 
@@ -327,13 +327,12 @@
       
 
       
-        <p>去年毕业到现在刚好工作一年了(离我第一篇博客刚好也一年时间了)，趁着这篇博客将自己根据学校的知识和实际开发的经验生成的知识体系简单的梳理一遍吧   </p>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>本文会根据某些小demo，来扯出一些平时开发欠缺的知识点</p>
+        <p>去年毕业到现在刚好工作一年了(离我第一篇博客刚好也一年时间了)，聊一些之后学习的方向吧</p>
 <a id="more"></a>
-<h2 id="语言-Swift"><a href="#语言-Swift" class="headerlink" title="语言(Swift)"></a>语言(Swift)</h2><p>之前我有分享过Swift<a href="https://tannerjin.github.io/2018/12/27/Swift%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80/" target="_blank" rel="noopener">语言类型的内存布局</a>以及<a href="https://tannerjin.github.io/2019/01/06/Swift%E6%96%B9%E6%B3%95%E8%B0%83%E7%94%A8/" target="_blank" rel="noopener">函数派发方式</a></p>
-<h3 id="指针"><a href="#指针" class="headerlink" title="指针"></a>指针</h3><p>语言是程序员接触最多的一块了。由于现代语言(如Swift，Java， Kotlin等)编译器优化带来的便利性，让程序猿忽略了很多操作系统层面的东西(当然有些程序猿并不care这些东西，那这篇文章可能不适合你)。</p>
-<p>其中最明显的就是<strong>指针</strong><br>指针是一个点，是计算机内存区域中的某一个点，平常我们说的寻址寻址，就是指针的值表示的地址(这是自我的理解，具体去可以参考书籍)。说到计算机内存又能牵扯出物理内存和虚拟内存，说到虚拟内存又能说到堆栈，代码区。。。说到代码区又能扯到可执行文件，说到可执行文件，和编译器和语言又有关系。</p>
-<p>这也是为什么我们大学学的第一门计算机课程C语言的总要性。因为指针，我们能更好的理解操作系统。(在我的认知中，计算机的操作主要就是(或者说全部)依赖于地址和偏移)</p>
+<h2 id="语言-Swift"><a href="#语言-Swift" class="headerlink" title="语言(Swift)"></a>语言(Swift)</h2><p>之前有研究过Swift<a href="https://tannerjin.github.io/2018/12/27/Swift%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80/" target="_blank" rel="noopener">语言类型的内存布局</a>以及<a href="https://tannerjin.github.io/2019/01/06/Swift%E6%96%B9%E6%B3%95%E8%B0%83%E7%94%A8/" target="_blank" rel="noopener">函数派发方式</a></p>
+<h3 id="指针"><a href="#指针" class="headerlink" title="指针"></a>指针</h3><p>语言是程序员接触最多的一块了。由于现代语言(如Swift，Java， Kotlin等)编译器优化带来的便利性，让程序猿忽略了很多操作系统层面的东西。</p>
+<p>其中最明显的就是<strong>指针</strong><br>指针是一个点，是计算机内存区域中的某一个点，平常我们说的寻址寻址，就是指针的值表示的虚拟内存地址，虚拟内存又和实际的物理内存(硬件)有一个映射关系。说到虚拟内存又能说到堆栈，代码区。。。说到代码区又能扯到可执行文件，说到可执行文件，和编译器和语言又有关系。</p>
+<p>这也是为什么我们大学学的第一门计算机课程C语言的总要性。因为指针，我们能更好的理解操作系统。</p>
 <p>这里我简单的举一个Objective-C和Swift的例子来看下不同吧</p>
 <figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">A</span> </span>&#123;</span><br><span class="line">	<span class="keyword">var</span> b: <span class="type">Int8</span>?</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// C++的写法</span></span><br><span class="line"><span class="type">A</span>* a = (<span class="type">A</span> *)malloc(<span class="built_in">sizeof</span>(<span class="type">A</span>));</span><br><span class="line">a-&gt;b = <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Objective-C的写法</span></span><br><span class="line"><span class="type">A</span>* a = [<span class="type">A</span> alloc];</span><br><span class="line">a.b = <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Swift的写法</span></span><br><span class="line"><span class="keyword">let</span> a = <span class="type">A</span>()</span><br><span class="line">a.b = <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
 <p>(上面demo并不保证过编译)<br>可以看到从C++到OC到Swift，操作系统的相关的(内存)操作越来越少了。 </p>
@@ -350,8 +349,10 @@
 <p>这里再复习下王爽的《汇编语言》的CPU读取下一行指令方式(非跳转指令)。pc(cs:ip)寄存器指向着CPU下一行指令的地址，而每行指令也是占用代码段的内存空间的，有个占2个字节，有的占4个字节。下一行指令的地址=当前这行指令+当前这行指令的字节数大小</p>
 </li>
 </ol>
-<p>可以看到随着语言的进步，编译器的优化，我们写代码需要考虑的东西少了，但是运行在操作系统上的操作还是不变的。</p>
-<h2 id="编译-swift-llvm"><a href="#编译-swift-llvm" class="headerlink" title="编译(swift-llvm)"></a>编译(swift-llvm)</h2><h3 id="类和VTable"><a href="#类和VTable" class="headerlink" title="类和VTable"></a>类和VTable</h3><p>最近刚开始看LLVM，感觉还没入门。所以该文这块借助下语言和平台二进制聊聊经过编译后，我们的写的代码变成了啥。<br>我们平常写Swift(或者其他语言)，我个人简单的分为两大块: 类型和函数  </p>
+<p>可以看到随着语言的进步，编译器的优化，我们写代码需要考虑的东西少了，但是运行在操作系统上的操作还是不变的。   </p>
+<p>庆幸的是Swift保留了指针的操作，并且Swift标注库也用到的很多指针操作</p>
+<h2 id="编译-swift-llvm"><a href="#编译-swift-llvm" class="headerlink" title="编译(swift-llvm)"></a>编译(swift-llvm)</h2><p>现代语言编译器非常强大，除了给我们的代码生成机器码之外，还给我们的代码插入了很多额外有效的代码，如</p>
+<h3 id="引用计数"><a href="#引用计数" class="headerlink" title="引用计数"></a>引用计数</h3><h3 id="类和VTable"><a href="#类和VTable" class="headerlink" title="类和VTable"></a>类和VTable</h3><p>最近刚开始看LLVM，感觉还没入门。所以该文这块借助下语言和平台二进制聊聊经过编译后，我们的写的代码变成了啥。<br>我们平常写Swift(或者其他语言)，我个人简单的分为两大块: 类型和函数  </p>
 <p><strong>类型</strong>(包括类，结构体，Swift的协议。。。)的目的是内存分配的描述，计算机可没那么聪明,它可不知道不同的类型该怎么分配内存，都是编译器根据语言的类型生成分配多少内存的指令，获取取多少偏移的内存。类型中属性的set和get只需要通过类型实例指针的偏移操作即可 （当然对于Swift的类来说，除了内存分配描述作用，还有存放着实例方法的地址等信息，并且Swift类实例化成的对象是在堆中的。所以Swift类的信息是回被编译到二进制中的，这也是我们常说的类对象。具体可以看看下面可执行文件的Data区的_ objc_ classlist(这也是著名的逆向工具class-dump的思路来源)） </p>
 <p><strong>函数</strong>。就不言而喻了   </p>
 <p>这里也随便举个小荔枝，虾扯下</p>
@@ -414,7 +415,9 @@
 <li>vm_protection(虚拟内存权限)</li>
 </ol>
 <h4 id="空指针区-PAGEZERO"><a href="#空指针区-PAGEZERO" class="headerlink" title="空指针区(PAGEZERO)"></a>空指针区(PAGEZERO)</h4><p>0x0 - 0x100000000 (64位)</p>
-<h4 id="代码相关区-Text"><a href="#代码相关区-Text" class="headerlink" title="代码相关区(Text)"></a>代码相关区(Text)</h4><h4 id="数据相关区-Data"><a href="#数据相关区-Data" class="headerlink" title="数据相关区(Data)"></a>数据相关区(Data)</h4><h4 id="链接库相关区-LINKEDIT"><a href="#链接库相关区-LINKEDIT" class="headerlink" title="链接库相关区(LINKEDIT)"></a>链接库相关区(LINKEDIT)</h4><h4 id="堆区-Heap"><a href="#堆区-Heap" class="headerlink" title="堆区(Heap)"></a>堆区(Heap)</h4><h4 id="栈区-Statck"><a href="#栈区-Statck" class="headerlink" title="栈区(Statck)"></a>栈区(Statck)</h4><h4 id="内核区-Kernel"><a href="#内核区-Kernel" class="headerlink" title="内核区(Kernel)"></a>内核区(Kernel)</h4>
+<h4 id="代码相关区-Text"><a href="#代码相关区-Text" class="headerlink" title="代码相关区(Text)"></a>代码相关区(Text)</h4><h4 id="数据相关区-Data"><a href="#数据相关区-Data" class="headerlink" title="数据相关区(Data)"></a>数据相关区(Data)</h4><h4 id="链接库相关区-LINKEDIT"><a href="#链接库相关区-LINKEDIT" class="headerlink" title="链接库相关区(LINKEDIT)"></a>链接库相关区(LINKEDIT)</h4><h4 id="堆区-Heap"><a href="#堆区-Heap" class="headerlink" title="堆区(Heap)"></a>堆区(Heap)</h4><h4 id="栈区-Statck"><a href="#栈区-Statck" class="headerlink" title="栈区(Statck)"></a>栈区(Statck)</h4><p>每个线程都有自己的栈空间，在线程中执行某个方法时，生成的局部变量，都会创建在栈中(编译器会将alloca操作隐藏)，在通过pop指令再将变量数据出栈</p>
+<p>栈还有两个非常重要的寄存器，rbp和rsp寄存器<br>rbp用于</p>
+<h4 id="内核区-Kernel"><a href="#内核区-Kernel" class="headerlink" title="内核区(Kernel)"></a>内核区(Kernel)</h4>
       
     </div>
     
@@ -527,7 +530,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-count">13</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -598,7 +601,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#语言-Swift"><span class="nav-number">2.</span> <span class="nav-text">语言(Swift)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#指针"><span class="nav-number">2.1.</span> <span class="nav-text">指针</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编译-swift-llvm"><span class="nav-number">3.</span> <span class="nav-text">编译(swift-llvm)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#类和VTable"><span class="nav-number">3.1.</span> <span class="nav-text">类和VTable</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#可执行文件-Mach-O-Dyld"><span class="nav-number">4.</span> <span class="nav-text">可执行文件(Mach-O, Dyld)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#PAGEZERO"><span class="nav-number">4.0.1.</span> <span class="nav-text">__PAGEZERO</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TEXT"><span class="nav-number">4.0.2.</span> <span class="nav-text">__TEXT</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DATA"><span class="nav-number">4.0.3.</span> <span class="nav-text">__DATA</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#LINKEDIT"><span class="nav-number">4.0.4.</span> <span class="nav-text">__LINKEDIT</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#操作系统-iOS-MacOS"><span class="nav-number">5.</span> <span class="nav-text">操作系统(iOS/MacOS)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#进程"><span class="nav-number">5.1.</span> <span class="nav-text">进程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#虚拟内存"><span class="nav-number">5.2.</span> <span class="nav-text">虚拟内存</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#空指针区-PAGEZERO"><span class="nav-number">5.2.1.</span> <span class="nav-text">空指针区(PAGEZERO)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#代码相关区-Text"><span class="nav-number">5.2.2.</span> <span class="nav-text">代码相关区(Text)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#数据相关区-Data"><span class="nav-number">5.2.3.</span> <span class="nav-text">数据相关区(Data)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#链接库相关区-LINKEDIT"><span class="nav-number">5.2.4.</span> <span class="nav-text">链接库相关区(LINKEDIT)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#堆区-Heap"><span class="nav-number">5.2.5.</span> <span class="nav-text">堆区(Heap)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#栈区-Statck"><span class="nav-number">5.2.6.</span> <span class="nav-text">栈区(Statck)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#内核区-Kernel"><span class="nav-number">5.2.7.</span> <span class="nav-text">内核区(Kernel)</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#语言-Swift"><span class="nav-number">1.</span> <span class="nav-text">语言(Swift)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#指针"><span class="nav-number">1.1.</span> <span class="nav-text">指针</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编译-swift-llvm"><span class="nav-number">2.</span> <span class="nav-text">编译(swift-llvm)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#引用计数"><span class="nav-number">2.1.</span> <span class="nav-text">引用计数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#类和VTable"><span class="nav-number">2.2.</span> <span class="nav-text">类和VTable</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#可执行文件-Mach-O-Dyld"><span class="nav-number">3.</span> <span class="nav-text">可执行文件(Mach-O, Dyld)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#PAGEZERO"><span class="nav-number">3.0.1.</span> <span class="nav-text">__PAGEZERO</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TEXT"><span class="nav-number">3.0.2.</span> <span class="nav-text">__TEXT</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DATA"><span class="nav-number">3.0.3.</span> <span class="nav-text">__DATA</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#LINKEDIT"><span class="nav-number">3.0.4.</span> <span class="nav-text">__LINKEDIT</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#操作系统-iOS-MacOS"><span class="nav-number">4.</span> <span class="nav-text">操作系统(iOS/MacOS)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#进程"><span class="nav-number">4.1.</span> <span class="nav-text">进程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#虚拟内存"><span class="nav-number">4.2.</span> <span class="nav-text">虚拟内存</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#空指针区-PAGEZERO"><span class="nav-number">4.2.1.</span> <span class="nav-text">空指针区(PAGEZERO)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#代码相关区-Text"><span class="nav-number">4.2.2.</span> <span class="nav-text">代码相关区(Text)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#数据相关区-Data"><span class="nav-number">4.2.3.</span> <span class="nav-text">数据相关区(Data)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#链接库相关区-LINKEDIT"><span class="nav-number">4.2.4.</span> <span class="nav-text">链接库相关区(LINKEDIT)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#堆区-Heap"><span class="nav-number">4.2.5.</span> <span class="nav-text">堆区(Heap)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#栈区-Statck"><span class="nav-number">4.2.6.</span> <span class="nav-text">栈区(Statck)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#内核区-Kernel"><span class="nav-number">4.2.7.</span> <span class="nav-text">内核区(Kernel)</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>

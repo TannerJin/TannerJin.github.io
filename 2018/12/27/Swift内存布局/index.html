@@ -114,7 +114,7 @@
 <meta property="og:image" content="http://yoursite.com/images/Swift_memoryLayout/associative1.png">
 <meta property="og:image" content="http://yoursite.com/images/Swift_memoryLayout/associative2.png">
 <meta property="og:image" content="http://yoursite.com/images/Swift_memoryLayout/isa_exchange.png">
-<meta property="og:updated_time" content="2019-07-29T06:31:56.261Z">
+<meta property="og:updated_time" content="2019-08-30T06:40:18.851Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Swift内存布局">
 <meta name="twitter:description" content="参考链接1参考链接2 ps:本文所有测试基于64位计算机由于计算机内部是小端读取内存的(因此都是向后读取内存)本文基于Swift4.2, Xcode10.0">
@@ -352,6 +352,8 @@
 <p><strong>ps:</strong><br><strong>本文所有测试基于64位计算机</strong><br><strong>由于计算机内部是小端读取内存的(因此都是向后读取内存)</strong><br><strong>本文基于Swift4.2, Xcode10.0</strong></p>
  <a id="more"></a> 
  <figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">MemoryLayout</span>&lt;<span class="type">T</span>&gt;.size      <span class="comment">// 类型T需要的内存大小</span></span><br><span class="line"><span class="type">MemoryLayout</span>&lt;<span class="type">T</span>&gt;.<span class="built_in">stride</span>    <span class="comment">// 类型T实际分配的内存大小(由于内存对齐原则，会多出空白的空间)</span></span><br><span class="line"><span class="type">MemoryLayout</span>&lt;<span class="type">T</span>&gt;.alignment  <span class="comment">// 内存对齐的基数</span></span><br></pre></td></tr></table></figure>
+<p> 这是研究的总结：<br> <a href="&quot;https://github.com/TannerJin/Swift-MemoryLayout&quot;">Swift-MemoryLayout</a>   </p>
+<p> 底下是研究的过程(有些结论没有及时更新，上面的结论链接会及时更新)</p>
 <h3 id="Struct"><a href="#Struct" class="headerlink" title="Struct"></a>Struct</h3><p>struct的内存结构比较简单，和C以及C++的struct内存布局非常类似。   </p>
 <p>// 测试代码   </p>
 <figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Foo</span> </span>&#123;</span><br><span class="line">    <span class="keyword">let</span> a: <span class="type">Int8</span> = <span class="number">2</span>   <span class="comment">// 1 byte</span></span><br><span class="line">    <span class="keyword">let</span> b: <span class="type">Int16</span> = <span class="number">4</span>  <span class="comment">// 2 bytes</span></span><br><span class="line">    <span class="keyword">let</span> <span class="built_in">c</span>: <span class="type">Int32</span> = <span class="number">6</span>  <span class="comment">// 4 bytes</span></span><br><span class="line">    <span class="keyword">let</span> d: <span class="type">Int</span> = <span class="number">8</span>    <span class="comment">// 8 bytes</span></span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">foo</span><span class="params">()</span></span> &#123;</span><br><span class="line">    	<span class="built_in">print</span>(<span class="string">"Hello"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> foo = <span class="type">Foo</span>()</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="type">MemoryLayout</span>&lt;<span class="type">Foo</span>&gt;.size)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">"===end==="</span>)</span><br></pre></td></tr></table></figure>
@@ -587,7 +589,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-count">13</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
