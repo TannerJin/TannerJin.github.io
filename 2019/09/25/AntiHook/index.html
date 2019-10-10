@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="iOS安全,iOS逆向," />
+  <meta name="keywords" content="iOS安全," />
 
 
 
@@ -79,18 +79,22 @@
 
 
 
-<meta name="description" content="为了防止App被别人动态调试(动态调试目的)，可以在项目中进行动态调试检测或者禁止动态调试。   参考自庆哥的关于反调试&amp;amp;反反调试那些事">
-<meta name="keywords" content="iOS安全,iOS逆向">
+<meta name="description" content="AntiFishHookantiFishHook 是我今年早些写的一个反fishhook的一个反hook工具根据mach-o的符号动态链接原理，让non-lazy/lazy symbol 指针重新指向对应的symbol stub代码位置，起到在runtime的反hook">
+<meta name="keywords" content="iOS安全">
 <meta property="og:type" content="article">
-<meta property="og:title" content="iOS安全-反调试(Swift)">
-<meta property="og:url" content="http://yoursite.com/2018/09/19/iOS安全-反调试/index.html">
+<meta property="og:title" content="AntiHook">
+<meta property="og:url" content="http://yoursite.com/2019/09/25/AntiHook/index.html">
 <meta property="og:site_name" content="Tanner Jin">
-<meta property="og:description" content="为了防止App被别人动态调试(动态调试目的)，可以在项目中进行动态调试检测或者禁止动态调试。   参考自庆哥的关于反调试&amp;amp;反反调试那些事">
+<meta property="og:description" content="AntiFishHookantiFishHook 是我今年早些写的一个反fishhook的一个反hook工具根据mach-o的符号动态链接原理，让non-lazy/lazy symbol 指针重新指向对应的symbol stub代码位置，起到在runtime的反hook">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-04-21T05:57:43.867Z">
+<meta property="og:image" content="http://yoursite.com/images/AntiHook/antiHook.1.png">
+<meta property="og:image" content="http://yoursite.com/images/AntiHook/antiHook.2.png">
+<meta property="og:image" content="http://yoursite.com/images/AntiHook/antiHook.3.png">
+<meta property="og:updated_time" content="2019-10-10T10:01:27.506Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="iOS安全-反调试(Swift)">
-<meta name="twitter:description" content="为了防止App被别人动态调试(动态调试目的)，可以在项目中进行动态调试检测或者禁止动态调试。   参考自庆哥的关于反调试&amp;amp;反反调试那些事">
+<meta name="twitter:title" content="AntiHook">
+<meta name="twitter:description" content="AntiFishHookantiFishHook 是我今年早些写的一个反fishhook的一个反hook工具根据mach-o的符号动态链接原理，让non-lazy/lazy symbol 指针重新指向对应的symbol stub代码位置，起到在runtime的反hook">
+<meta name="twitter:image" content="http://yoursite.com/images/AntiHook/antiHook.1.png">
 
 
 
@@ -120,13 +124,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/09/19/iOS安全-反调试/"/>
+  <link rel="canonical" href="http://yoursite.com/2019/09/25/AntiHook/"/>
 
 
 
 
 
-  <title>iOS安全-反调试(Swift) | Tanner Jin</title>
+  <title>AntiHook | Tanner Jin</title>
   
 
 
@@ -253,7 +257,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/19/iOS安全-反调试/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/25/AntiHook/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Tanner Jin">
@@ -270,7 +274,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">iOS安全-反调试(Swift)</h1>
+          <h1 class="post-title" itemprop="name headline">AntiHook</h1>
         
 
         <div class="post-meta">
@@ -282,8 +286,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-19T14:17:11+08:00">
-                2018-09-19
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-09-25T13:37:51+08:00">
+                2019-09-25
               </time>
             
 
@@ -342,11 +346,33 @@
       
 
       
-        <p>为了防止App被别人动态调试(<a href="">动态调试目的</a>)，可以在项目中进行动态调试检测或者禁止动态调试。   参考自庆哥的<a href="http://www.alonemonkey.com/2017/05/25/antiantidebug/" target="_blank" rel="noopener">关于反调试&amp;反反调试那些事</a><br><a id="more"></a>   </p>
-<p>庆总写的方法实现以及方法的原理以及挺详细了，但是Swift项目中调用C的API还是不太方便，顾写了个Swift版的~<br>(记得方法调用的时候要区分是Release还得Debug版的，不然正常开发调试也会退出程序了)</p>
-<h3 id="ptrace"><a href="#ptrace" class="headerlink" title="ptrace"></a>ptrace</h3><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">diyPtrace</span><span class="params">()</span></span> &#123;  </span><br><span class="line">	<span class="comment">// PT_DENY_ATTACH的值</span></span><br><span class="line">	<span class="keyword">let</span> attach: <span class="type">CInt</span> = <span class="number">31</span> </span><br><span class="line">    <span class="keyword">let</span> handle = dlopen(<span class="string">"/usr/lib/libc.dylib"</span>, <span class="type">RTLD_NOW</span>) </span><br><span class="line">    <span class="keyword">let</span> sym = dlsym(handle, <span class="string">"ptrace"</span>) </span><br><span class="line">    <span class="keyword">typealias</span> <span class="type">PtraceAlias</span> = <span class="meta">@convention</span>(<span class="built_in">c</span>) (<span class="type">CInt</span>, pid_t, <span class="type">CInt</span>, <span class="type">CInt</span>) -&gt; <span class="type">CInt</span> </span><br><span class="line">    <span class="keyword">let</span> diyPtrace = <span class="built_in">unsafeBitCast</span>(sym, to: <span class="type">PtraceAlias</span>.<span class="keyword">self</span>) </span><br><span class="line">    <span class="number">_</span> = diyPtrace(attach, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>) </span><br><span class="line">    dlclose(handle) </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="sysctl"><a href="#sysctl" class="headerlink" title="sysctl"></a>sysctl</h3><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">isDebugger</span><span class="params">()</span></span> -&gt; <span class="type">Bool</span> &#123;</span><br><span class="line">    <span class="keyword">var</span> name = [<span class="type">Int32</span>]()</span><br><span class="line">    name.append(<span class="type">CTL_KERN</span>)</span><br><span class="line">    name.append(<span class="type">KERN_PROC</span>)</span><br><span class="line">    name.append(<span class="type">KERN_PROC_PID</span>)</span><br><span class="line">    name.append(getpid())</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> info = kinfo_proc()</span><br><span class="line">    info.kp_proc.p_flag = <span class="number">0</span></span><br><span class="line">    <span class="keyword">var</span> infoSize = <span class="type">MemoryLayout</span>.size(ofValue: info) <span class="keyword">as</span> size_t</span><br><span class="line">    <span class="keyword">if</span> sysctl(&amp;name, <span class="number">4</span>, &amp;info, &amp;infoSize, <span class="literal">nil</span>, <span class="number">0</span>) == -<span class="number">1</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> (info.kp_proc.p_flag &amp; <span class="type">P_TRACED</span>) != <span class="number">0</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 调用</span></span><br><span class="line"><span class="keyword">if</span> <span class="type">Debugger</span>() &#123;</span><br><span class="line">	exit(<span class="number">0</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="GCD"><a href="#GCD" class="headerlink" title="GCD"></a>GCD</h3><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">var</span> stopSource: <span class="type">DispatchSourceSignal</span>!</span><br><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">func</span> <span class="title">debugDetection3</span><span class="params">()</span></span> &#123;</span><br><span class="line">    stopSource = <span class="type">DispatchSource</span>.makeSignalSource(signal: <span class="type">SIGSTOP</span>, queue: <span class="type">DispatchQueue</span>.main)</span><br><span class="line">    stopSource.setEventHandler(qos: .userInteractive) &#123;</span><br><span class="line">         exit(<span class="number">0</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    stopSource.resume()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+        <h2 id="AntiFishHook"><a href="#AntiFishHook" class="headerlink" title="AntiFishHook"></a>AntiFishHook</h2><p><a href="https://github.com/TannerJin/anti-fishhook" target="_blank" rel="noopener">antiFishHook</a> 是我今年早些写的一个反<a href="https://github.com/facebook/fishhook" target="_blank" rel="noopener">fishhook</a>的一个反hook工具<br>根据mach-o的符号动态链接原理，让non-lazy/lazy symbol 指针重新指向对应的symbol stub代码位置，起到在runtime的反hook   </p>
+<a id="more"></a>    
+<p>那么如何找到符号指针对应的stub代码，其实可以先用MachOView静态的观察数据段的lazy symbol pointers指向的指令的特点。如下图，   </p>
+<p><img src="\images\AntiHook\antiHook.1.png" alt=""></p>
+<p>每个指针的值减去0x100000000可以得到一个文件偏移的值，0x7E74,0x7E38 … 而文件偏移值指向的是代码段 stub helper的位置, 并且每个函数的指令格式都一样, 如下</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ldr w16 #xxxx0</span><br><span class="line">b xxxx1</span><br><span class="line">xxxx0</span><br></pre></td></tr></table></figure>
+<p>xxxx0表示ldr w16 #xxxx0指令位置 + 8字节内存地址的数据<br>xxxx1表示symbol stub代码的位置</p>
+<p>每个不同的符号，xxxx0是不同的，但是xxxx1的位置是一样的<br>因此可以知道符号的信息在xxxx0中，那么xxxx0代表什么呢？   </p>
+<p>首先先来看看xxxx0的值都是些什么吧，xxxx0占用4个字节，某个符号的xxxx0数据如下</p>
+<p><img src="\images\AntiHook\antiHook.2.png" alt=""></p>
+<p>0x20,0x01,0x00,0x00, 机器读取的数据为0x0120, 那么这代表什么数据呢？   </p>
+<p>如果对mach-o比较熟悉的可能知道mach-o有一个Dynamic Loader Info段, 这里一共有四个区，分别是    </p>
+<p><strong>Rebase Info</strong>:   pointer rebase的信息<br><strong>Binding Info</strong>:  non-lazy symbol pointer绑定需要的信息<br><strong>Lazy Binding Info</strong>: lazy symbol pointer绑定需要的信息<br><strong>Export Info</strong>: 暴露给外部的符号的信息</p>
+<p>  在拜读庆总的《iOS应用逆向与安全》过程中, 发现0x0120是Binding Info或者Lazy Binding Info区起始开始到符号信息的偏移，而符号信息如下图</p>
+<p>  <img src="\images\AntiHook\antiHook.3.png" alt=""></p>
+<p>  可以看到偏移+6 bytes是该符号名，根据这个信息，就可以筛选出stub helper模板指令对应的符号了，从而将non/lazy symbol pointer从新指向对应的stub helper区代码地址，起到anti-fishhook的功能</p>
+<h2 id="AntiMSHook"><a href="#AntiMSHook" class="headerlink" title="AntiMSHook"></a>AntiMSHook</h2><p><a href="https://github.com/TannerJin/AntiMSHookFunction" target="_blank" rel="noopener">antiMSHook</a> 是我最近学习MSHookFunction原理的时候想到一个anti-msHook方案，实现效果和anti-fishhook一样，让msHook在runtime失效。</p>
+<p>anti-msHook包括两个hook check和anti-hook   </p>
+<p><strong>hook check</strong> 比较简单，主要是检测函数入口的前面4个指令是否是MSHook的模板指令   </p>
+<p><strong>anti-hook</strong> 则利用了MSHook将被hook的指令分配到新的内存区域(mmap)，通过遍历进程的虚拟内存区域，查看可读可执行的区域开头几个指令是否存在下面指令，如果存在，则找到了被msHook的指令。直接jump到该内存区域，执行原来的函数逻辑</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ldr x16 #8</span><br><span class="line">br x16</span><br><span class="line">bytes  // bytes(pointer) =&gt; orig_address + 16</span><br></pre></td></tr></table></figure>
+<h2 id="单指令Hook检测"><a href="#单指令Hook检测" class="headerlink" title="单指令Hook检测"></a>单指令Hook检测</h2><p>在学习<a href="http://bbs.iosre.com/t/ios-inlinehook/15559" target="_blank" rel="noopener">iOS inlinehook绕过反调试</a>时产生的想法。<br>目前还只是想法   </p>
+<p>还是反调试那个例子    </p>
+<ol>
+<li>检查目的函数起始地址到10个(视情况定)指令内是否存在mov x16, #26(0xd2800350); svc #128(0xd4001001) 二进制(检测svc 没被patch)    </li>
+<li>参考金丝雀的思路，在写代码时，在目的函数执行前初始化1个变量如int a=0; 在svc指令后面对a++, 目的函数执行完判断a == 1(防止svc 之前patch ret)</li>
+</ol>
 
       
     </div>
@@ -366,8 +392,6 @@
           
             <a href="/tags/iOS安全/" rel="tag"># iOS安全</a>
           
-            <a href="/tags/iOS逆向/" rel="tag"># iOS逆向</a>
-          
         </div>
       
 
@@ -379,8 +403,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/09/12/iOS逆向学习笔记-三-静态分析/" rel="next" title="iOS逆向学习笔记(三) 静态分析">
-                <i class="fa fa-chevron-left"></i> iOS逆向学习笔记(三) 静态分析
+              <a href="/2019/06/23/工作一年杂谈/" rel="next" title="工作一年杂谈">
+                <i class="fa fa-chevron-left"></i> 工作一年杂谈
               </a>
             
           </div>
@@ -388,10 +412,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/10/13/LLVM学习笔记-clang常用指令/" rel="prev" title="LLVM学习笔记-Clang和SwiftC常用指令使用">
-                LLVM学习笔记-Clang和SwiftC常用指令使用 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -543,7 +563,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#ptrace"><span class="nav-number">1.</span> <span class="nav-text">ptrace</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sysctl"><span class="nav-number">2.</span> <span class="nav-text">sysctl</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GCD"><span class="nav-number">3.</span> <span class="nav-text">GCD</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#AntiFishHook"><span class="nav-number">1.</span> <span class="nav-text">AntiFishHook</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AntiMSHook"><span class="nav-number">2.</span> <span class="nav-text">AntiMSHook</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#单指令Hook检测"><span class="nav-number">3.</span> <span class="nav-text">单指令Hook检测</span></a></li></ol></div>
             
 
           </div>
