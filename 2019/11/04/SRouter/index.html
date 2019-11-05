@@ -88,7 +88,7 @@
 <meta property="og:description" content="SRouter是为了解决模块和模块间的引用，根据符号导出(Symbol Export)实现的一个路由方案">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://yoursite.com/images/SRouter/SRouter-1.png">
-<meta property="og:updated_time" content="2019-11-05T02:34:53.214Z">
+<meta property="og:updated_time" content="2019-11-05T02:38:05.637Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="SRouter">
 <meta name="twitter:description" content="SRouter是为了解决模块和模块间的引用，根据符号导出(Symbol Export)实现的一个路由方案">
@@ -350,7 +350,7 @@
 <p>对于符号导出，当你在导出文件中加上该符号时，即使你声明的函数为internal，你的函数符号也会导出   </p>
 <p>对于符号重排，当你在重排文件中加上该符号时，你的函数实现会在代码段的代码区的最前面  </p>
 <p>对于符号不导出，当你在不导出文件中加上该符号时，即使你声明的函数为public，你的函数符号也不会导出，其他动态库调用你public声明的函数，在链接期间也会报符号未定义的错误(别拿来坑队友喔)</p>
-<p><a href="https://developer.apple.com/library/archive/documentation/MacOSX/Conceptual/BPFrameworks/Tasks/ExportingInterfaces.html" target="_blank" rel="noopener">Exporting Your Framework Interface</a><br><a href="">Minimizing Your Exported Symbols</a></p>
+<p><a href="https://developer.apple.com/library/archive/documentation/MacOSX/Conceptual/BPFrameworks/Tasks/ExportingInterfaces.html" target="_blank" rel="noopener">Exporting Your Framework Interface</a><br><a href="https://developer.apple.com/library/archive/documentation/Performance/Conceptual/CodeFootprint/Articles/ReducingExports.html" target="_blank" rel="noopener">Minimizing Your Exported Symbols</a></p>
 <h4 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h4><p>导出的符号会在动态库(Mach-O)的Dynamic Loader Info段 的 Export Info区，这个区的数据结构是根据导出的符号名生成的一棵多叉数，每一条路径代表一个符号，最终可以找到对应符号的信息</p>
 <p>这样的话，只需要将路由接口符号导出，在其他模块通过<strong>SRouter</strong>动态链接”路由”过去，从而解决模块引用问题(无需import)   </p>
 <h4 id="实现问题"><a href="#实现问题" class="headerlink" title="实现问题"></a>实现问题</h4><p>当然手动的将每个路由符号添加到符号导出文件中比较麻烦，可以利用以下两个编译属性来实现。   </p>
