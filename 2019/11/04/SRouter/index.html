@@ -88,7 +88,7 @@
 <meta property="og:description" content="SRouter是为了解决模块和模块间的引用，根据符号导出(Symbol Export)实现的一个路由方案">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://yoursite.com/images/SRouter/SRouter-1.png">
-<meta property="og:updated_time" content="2019-11-04T10:36:32.590Z">
+<meta property="og:updated_time" content="2019-11-05T02:34:53.214Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="SRouter">
 <meta name="twitter:description" content="SRouter是为了解决模块和模块间的引用，根据符号导出(Symbol Export)实现的一个路由方案">
@@ -325,7 +325,7 @@
         <p><a href="https://github.com/TannerJin/SRouter" target="_blank" rel="noopener"><strong>SRouter</strong></a>是为了解决模块和模块间的引用，根据符号导出(Symbol Export)实现的一个路由方案    </p>
  <a id="more"></a>    
 <h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><p>我们在把项目进行组件化的过程中，会将不同业务进行模块化，甚至将某些业务模块制作成动态或者静态库来提供给不同项目，然后每个同学主要负责不同的业务模块<br>但是某个业务一般不会单一存在的，往往是业务A有个入口进入到业务B，业务B又有几个入口到业务C,D等等。。。<br>这个时候就会出现模块A import B，模块B import C，D… 这样某个同学在制作自己的模块时，还得导入其他同学的模块，否则就编译GG了。这样就增加了模块的耦合性了    </p>
-<p>为此，根据动态库编译链接原理，带来了这个无需import, 无需注册的路由方案 <strong>SRouter</strong></p>
+<p>为此，根据动态库编译链接原理，带来了这个无需import(避开了编译的链接，在runtime时链接), 无需注册的路由方案 <strong>SRouter</strong></p>
 <p>霜神的<a href="https://halfrost.com/ios_router" target="_blank" rel="noopener">iOS组件化-路由设计思路分析</a>这篇文章将目前业界大部分的路由方案都分析了一下。这些方案都是前辈们的智慧结晶，可以根据自己的项目进行可以参考选取    </p>
 <h3 id="实现效果"><a href="#实现效果" class="headerlink" title="实现效果"></a>实现效果</h3><p>先看下其中一个功能实现效果吧~</p>
 <h4 id="Swift"><a href="#Swift" class="headerlink" title="Swift"></a>Swift</h4><p>在登录业务模块(Login)定义一个接口</p>
@@ -343,17 +343,18 @@
 <figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">@_silgen_name(<span class="string">"Login://registered"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">func</span> <span class="title">RegisteredRouterInterface</span><span class="params">(with param: String)</span></span> -&gt; <span class="type">UIViewController</span> &#123;</span><br><span class="line">    <span class="keyword">let</span> registeredController = <span class="type">RegisteredViewController</span>(title: <span class="string">"Registered 🚀🚀🚀"</span>)</span><br><span class="line">    <span class="keyword">return</span> registeredController</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>其他任意模块路由到登录模块的注册接口</p>
 <figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typealias</span> <span class="type">RegisteredRouterSILFunctionType</span> = <span class="meta">@convention</span>(thin) (<span class="number">_</span> input: <span class="type">String</span>) -&gt; <span class="type">UIViewController</span></span><br><span class="line">        </span><br><span class="line"><span class="keyword">if</span> <span class="keyword">let</span> registeredController = <span class="type">SRouterManager</span>.<span class="keyword">default</span>.routeTo(<span class="string">"Login://registered"</span>, routerSILFunctionType: <span class="type">RegisteredRouterSILFunctionType</span>.<span class="keyword">self</span>)?(<span class="string">"注册 🚀🚀🚀"</span>) &#123;</span><br><span class="line">     <span class="keyword">self</span>.present(<span class="type">UINavigationController</span>(rootViewController: registeredController), animated: <span class="literal">true</span>, completion: <span class="literal">nil</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="实现原理"><a href="#实现原理" class="headerlink" title="实现原理"></a>实现原理</h3><h4 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h4><p>主要利用了编译链接的(Symbol Export)符号导出来实现的    </p>
+<h3 id="实现原理"><a href="#实现原理" class="headerlink" title="实现原理"></a>实现原理</h3><h4 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h4><p>主要利用了编译链接的(Symbol Export)符号导出来实现的        </p>
 <p><img src="\images\SRouter\SRouter-1.png" alt="">   </p>
 <p>如图所示，是Xcode的Linking配置</p>
 <p><strong>Exported Symbols File:</strong> 符号导出<br><strong>Order File:</strong> 符号重排 (之前头条用于启动优化)<br><strong>UnExported Symbols File:</strong> 符号不导出</p>
 <p>对于符号导出，当你在导出文件中加上该符号时，即使你声明的函数为internal，你的函数符号也会导出   </p>
 <p>对于符号重排，当你在重排文件中加上该符号时，你的函数实现会在代码段的代码区的最前面  </p>
 <p>对于符号不导出，当你在不导出文件中加上该符号时，即使你声明的函数为public，你的函数符号也不会导出，其他动态库调用你public声明的函数，在链接期间也会报符号未定义的错误(别拿来坑队友喔)</p>
+<p><a href="https://developer.apple.com/library/archive/documentation/MacOSX/Conceptual/BPFrameworks/Tasks/ExportingInterfaces.html" target="_blank" rel="noopener">Exporting Your Framework Interface</a><br><a href="">Minimizing Your Exported Symbols</a></p>
 <h4 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h4><p>导出的符号会在动态库(Mach-O)的Dynamic Loader Info段 的 Export Info区，这个区的数据结构是根据导出的符号名生成的一棵多叉数，每一条路径代表一个符号，最终可以找到对应符号的信息</p>
 <p>这样的话，只需要将路由接口符号导出，在其他模块通过<strong>SRouter</strong>动态链接”路由”过去，从而解决模块引用问题(无需import)   </p>
 <h4 id="实现问题"><a href="#实现问题" class="headerlink" title="实现问题"></a>实现问题</h4><p>当然手动的将每个路由符号添加到符号导出文件中比较麻烦，可以利用以下两个编译属性来实现。   </p>
-<h5 id="OC-OBJC-EXPORT"><a href="#OC-OBJC-EXPORT" class="headerlink" title="OC(OBJC_EXPORT)"></a>OC(OBJC_EXPORT)</h5><p>OBJC_EXPORT 关键字包括 extern 和<strong> attribute </strong>((visibility(“default”)))</p>
+<h5 id="OC-OBJC-EXPORT"><a href="#OC-OBJC-EXPORT" class="headerlink" title="OC(OBJC_EXPORT)"></a>OC(OBJC_EXPORT)</h5><p>OBJC_EXPORT 关键字包括 extern c 和<strong> attribute </strong>((visibility(“default”)))</p>
 <h5 id="Swift-silgen-name"><a href="#Swift-silgen-name" class="headerlink" title="Swift(@_ silgen_name)"></a>Swift(@_ silgen_name)</h5><p>@_ silgen_name是Swift中间语言SIL的一个属性</p>
 <p>@_ silgen_name有两个目的，以下是原话    </p>
 <ol>
@@ -362,7 +363,7 @@
 </ol>
 <p>第一个是指定函数符号，为了让C调用<br>第二个可以只声明一个函数符号，没有函数体，真正的函数实现是对应C的函数符号实现</p>
 <p>我利用了第一个目的，可以避免Swift mangling(Swift符号重整)，以及可以让函数符号external，这样其他模块就能动态链接该符号    </p>
-<p>当然@_ silgen_name编译后SIL函数类型是@convention(thin), 所以我在定义函数类型时会加上@convention(thin). 有兴趣的可以看下<a href="https://github.com/apple/swift/blob/master/docs/SIL.rst#function-types" target="_blank" rel="noopener">SIL Function Type</a></p>
+<p>当然@_ silgen_name编译成Swift中间语言后函数类型是@convention(thin), 所以我在定义函数类型时会加上@convention(thin). 有兴趣的可以看下<a href="https://github.com/apple/swift/blob/master/docs/SIL.rst#function-types" target="_blank" rel="noopener">SIL Function Type</a></p>
 
       
     </div>
