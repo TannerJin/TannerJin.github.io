@@ -90,7 +90,7 @@
 <meta property="og:image" content="http://yoursite.com/images/AntiHook/antiHook.1.png">
 <meta property="og:image" content="http://yoursite.com/images/AntiHook/antiHook.2.png">
 <meta property="og:image" content="http://yoursite.com/images/AntiHook/antiHook.3.png">
-<meta property="og:updated_time" content="2019-11-06T02:25:25.282Z">
+<meta property="og:updated_time" content="2019-11-06T02:53:44.607Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="AntiHook">
 <meta name="twitter:description" content="AntiFishHookantiFishHook 是我今年早些写的一个反fishhook的一个反hook工具根据mach-o的符号动态链接原理，让non-lazy/lazy symbol 指针重新指向对应的symbol stub代码位置，起到在runtime的反hook">
@@ -359,7 +359,7 @@
 <p>0x20,0x01,0x00,0x00, 机器读取的数据为0x0120, 那么这代表什么数据呢？   </p>
 <p>如果对mach-o比较熟悉的可能知道mach-o有一个Dynamic Loader Info段, 这里一共有四个区，分别是    </p>
 <p><strong>Rebase Info</strong>:   pointer rebase的信息<br><strong>Binding Info</strong>:  non-lazy symbol pointer绑定需要的信息<br><strong>Lazy Binding Info</strong>: lazy symbol pointer绑定需要的信息<br><strong>Export Info</strong>: 暴露给外部的符号的信息</p>
-<p>  其实在阅读dyld源码时，dyld_ stub_bind最后会调用fastBindLazySymbol函数，这个函数的第二个参数是lazyBindingInfoOffset, 即0x0120是Binding Info或者Lazy Binding Info区起始开始到符号信息的偏移，而符号信息如下图</p>
+<p>  其实在dyld源码里，dyld_ stub_bind最后会调用fastBindLazySymbol函数，这个函数的第二个参数是lazyBindingInfoOffset, 即0x0120是Binding Info或者Lazy Binding Info区起始开始到符号信息的偏移，而符号信息如下图</p>
 <p>  <img src="\images\AntiHook\antiHook.3.png" alt=""></p>
 <p>  可以看到偏移+6 bytes是该符号名，根据这个信息，就可以筛选出stub helper模板指令对应的符号了，从而将non/lazy symbol pointer从新指向对应的stub helper区代码地址，起到anti-fishhook的功能</p>
 <p>  (其实+6有些HardCode了，之后我又看了下getLazyBindingInfo函数, 发现在BIND_ OPCODE_ SET_ SYMBOL_ TRAILING_ FLAGS_IMM这个字节之后就是symbol Name)</p>
