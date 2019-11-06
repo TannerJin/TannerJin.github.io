@@ -88,7 +88,7 @@
 <meta property="og:description" content="SRouter是为了解决模块和模块间的引用，根据符号导出(Symbol Export)实现的一个路由方案">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://yoursite.com/images/SRouter/SRouter-1.png">
-<meta property="og:updated_time" content="2019-11-05T02:38:05.637Z">
+<meta property="og:updated_time" content="2019-11-05T06:37:20.598Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="SRouter">
 <meta name="twitter:description" content="SRouter是为了解决模块和模块间的引用，根据符号导出(Symbol Export)实现的一个路由方案">
@@ -325,7 +325,7 @@
         <p><a href="https://github.com/TannerJin/SRouter" target="_blank" rel="noopener"><strong>SRouter</strong></a>是为了解决模块和模块间的引用，根据符号导出(Symbol Export)实现的一个路由方案    </p>
  <a id="more"></a>    
 <h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><p>我们在把项目进行组件化的过程中，会将不同业务进行模块化，甚至将某些业务模块制作成动态或者静态库来提供给不同项目，然后每个同学主要负责不同的业务模块<br>但是某个业务一般不会单一存在的，往往是业务A有个入口进入到业务B，业务B又有几个入口到业务C,D等等。。。<br>这个时候就会出现模块A import B，模块B import C，D… 这样某个同学在制作自己的模块时，还得导入其他同学的模块，否则就编译GG了。这样就增加了模块的耦合性了    </p>
-<p>为此，根据动态库编译链接原理，带来了这个无需import(避开了编译的链接，在runtime时链接), 无需注册的路由方案 <strong>SRouter</strong></p>
+<p>为此，根据动态库编译链接原理，带来了这个无需import(避开了编译的链接，在runtime时链接), 无需注册的路由方案 <strong>SRouter</strong>    </p>
 <p>霜神的<a href="https://halfrost.com/ios_router" target="_blank" rel="noopener">iOS组件化-路由设计思路分析</a>这篇文章将目前业界大部分的路由方案都分析了一下。这些方案都是前辈们的智慧结晶，可以根据自己的项目进行可以参考选取    </p>
 <h3 id="实现效果"><a href="#实现效果" class="headerlink" title="实现效果"></a>实现效果</h3><p>先看下其中一个功能实现效果吧~</p>
 <h4 id="Swift"><a href="#Swift" class="headerlink" title="Swift"></a>Swift</h4><p>在登录业务模块(Login)定义一个接口</p>

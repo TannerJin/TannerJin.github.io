@@ -90,7 +90,7 @@
 <meta property="og:image" content="http://yoursite.com/images/AntiHook/antiHook.1.png">
 <meta property="og:image" content="http://yoursite.com/images/AntiHook/antiHook.2.png">
 <meta property="og:image" content="http://yoursite.com/images/AntiHook/antiHook.3.png">
-<meta property="og:updated_time" content="2019-10-10T16:00:49.385Z">
+<meta property="og:updated_time" content="2019-11-06T02:25:25.282Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="AntiHook">
 <meta name="twitter:description" content="AntiFishHookantiFishHook 是我今年早些写的一个反fishhook的一个反hook工具根据mach-o的符号动态链接原理，让non-lazy/lazy symbol 指针重新指向对应的symbol stub代码位置，起到在runtime的反hook">
@@ -352,16 +352,17 @@
 <p><img src="\images\AntiHook\antiHook.1.png" alt=""></p>
 <p>每个指针的值减去0x100000000可以得到一个文件偏移的值，0x7E74,0x7E38 … 而文件偏移值指向的是代码段 stub helper的位置, 并且每个函数的指令格式都一样, 如下</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ldr w16 #xxxx0</span><br><span class="line">b xxxx1</span><br><span class="line">xxxx0</span><br></pre></td></tr></table></figure>
-<p>xxxx0表示ldr w16 #xxxx0指令位置 + 8字节内存地址的数据<br>xxxx1表示symbol stub代码的位置</p>
+<p>xxxx0表示ldr w16 #xxxx0指令位置 + 8字节内存地址的数据<br>xxxx1表示dyld_ stub_binder代码的位置</p>
 <p>每个不同的符号，xxxx0是不同的，但是xxxx1的位置是一样的<br>因此可以知道符号的信息在xxxx0中，那么xxxx0代表什么呢？   </p>
 <p>首先先来看看xxxx0的值都是些什么吧，xxxx0占用4个字节，某个符号的xxxx0数据如下</p>
 <p><img src="\images\AntiHook\antiHook.2.png" alt=""></p>
 <p>0x20,0x01,0x00,0x00, 机器读取的数据为0x0120, 那么这代表什么数据呢？   </p>
 <p>如果对mach-o比较熟悉的可能知道mach-o有一个Dynamic Loader Info段, 这里一共有四个区，分别是    </p>
 <p><strong>Rebase Info</strong>:   pointer rebase的信息<br><strong>Binding Info</strong>:  non-lazy symbol pointer绑定需要的信息<br><strong>Lazy Binding Info</strong>: lazy symbol pointer绑定需要的信息<br><strong>Export Info</strong>: 暴露给外部的符号的信息</p>
-<p>  在拜读庆总的《iOS应用逆向与安全》过程中, 发现0x0120是Binding Info或者Lazy Binding Info区起始开始到符号信息的偏移，而符号信息如下图</p>
+<p>  其实在阅读dyld源码时，dyld_ stub_bind最后会调用fastBindLazySymbol函数，这个函数的第二个参数是lazyBindingInfoOffset, 即0x0120是Binding Info或者Lazy Binding Info区起始开始到符号信息的偏移，而符号信息如下图</p>
 <p>  <img src="\images\AntiHook\antiHook.3.png" alt=""></p>
 <p>  可以看到偏移+6 bytes是该符号名，根据这个信息，就可以筛选出stub helper模板指令对应的符号了，从而将non/lazy symbol pointer从新指向对应的stub helper区代码地址，起到anti-fishhook的功能</p>
+<p>  (其实+6有些HardCode了，之后我又看了下getLazyBindingInfo函数, 发现在BIND_ OPCODE_ SET_ SYMBOL_ TRAILING_ FLAGS_IMM这个字节之后就是symbol Name)</p>
 <h2 id="AntiMSHook"><a href="#AntiMSHook" class="headerlink" title="AntiMSHook"></a>AntiMSHook</h2><p><a href="https://github.com/TannerJin/AntiMSHookFunction" target="_blank" rel="noopener">antiMSHook</a> 是我最近学习MSHookFunction原理的时候想到一个anti-msHook方案，实现效果和anti-fishhook一样，让msHook在runtime失效。</p>
 <p>anti-msHook包括两个hook check和anti-hook   </p>
 <p><strong>hook check</strong> 比较简单，主要是检测函数入口的前面4个指令是否是MSHook的模板指令   </p>
