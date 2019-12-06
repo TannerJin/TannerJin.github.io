@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="根据《逆向工程核心原理》大致目录总结下自学iOS逆向工程所掌握的知识">
+<meta property="og:type" content="article">
+<meta property="og:title" content="逆向学习小结">
+<meta property="og:url" content="http://yoursite.com/2019/12/05/逆向学习小结/index.html">
+<meta property="og:site_name" content="Tanner Jin">
+<meta property="og:description" content="根据《逆向工程核心原理》大致目录总结下自学iOS逆向工程所掌握的知识">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/images/research/stack_1.png">
+<meta property="og:image" content="http://yoursite.com/images/research/stack_2.png">
+<meta property="og:image" content="http://yoursite.com/images/research/stack_3.png">
+<meta property="og:image" content="http://yoursite.com/images/research/stack_4.png">
+<meta property="og:image" content="http://yoursite.com/images/research/stack_5.png">
+<meta property="og:image" content="http://yoursite.com/images/research/stack_6.png">
+<meta property="og:image" content="http://yoursite.com/images/research/stack_7.png">
+<meta property="og:image" content="http://yoursite.com/images/research/stack_8.png">
+<meta property="og:updated_time" content="2019-12-06T09:28:58.847Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="逆向学习小结">
+<meta name="twitter:description" content="根据《逆向工程核心原理》大致目录总结下自学iOS逆向工程所掌握的知识">
+<meta name="twitter:image" content="http://yoursite.com/images/research/stack_1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/12/05/逆向学习小结/"/>
+
+
+
+
+
+  <title>逆向学习小结 | Tanner Jin</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Tanner Jin</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/12/05/逆向学习小结/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Tanner Jin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tanner Jin">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">逆向学习小结</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-05T13:34:18+08:00">
+                2019-12-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/逆向/" itemprop="url" rel="index">
+                    <span itemprop="name">逆向</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>根据《逆向工程核心原理》大致目录总结下自学iOS逆向工程所掌握的知识   </p>
+<a id="more"></a>   
+<h2 id="小端序标记法"><a href="#小端序标记法" class="headerlink" title="小端序标记法"></a>小端序标记法</h2><p>计算机基本都是小端读取数据，怎么解释呢? 如下</p>
+<p>10 20 30 40 a0 b0 c0 d0 · · · · · ·</p>
+<p>读取1个字节数据 (int8) data = 0x10<br>读取4个字节数据 (int32) data = 0x40302010<br>读取8个字节数据 (int64) data = 0xd0c0b0a040302010    </p>
+<h2 id="寄存器"><a href="#寄存器" class="headerlink" title="寄存器"></a>寄存器</h2><p>寄存器是cpu数据的一种储存设备，储存着cpu运行的数据(包括cpu下一个运行指令的地址，pc/rip寄存器)<br><a href="https://github.com/TannerJin/XNU/blob/master/thread/thread/Thread.swift#L48" target="_blank" rel="noopener">x86寄存器的作用</a></p>
+<p>arm常用寄存器:<br>x0 函数第1个参数/储存函数返回值<br>x1 函数第2个参数<br>x2 函数第3个参数<br>x3 函数第4个参数<br>x4 函数第5个参数<br>x5 函数第6个参数<br>x6 函数第7个参数<br>x7 函数第8个参数<br>(后面的参数存储在栈中)</p>
+<p>fp 栈帧(函数)<br>sp 栈顶(线程)<br>pc 当前线程所在CPU的核心运行的指令地址</p>
+<p>lldb寄存器read and set:<br>register read 读取所有寄存器<br>register read x0 读x0寄存器<br>register set x0 1 将x0寄存器的值赋值为1   </p>
+<h2 id="栈"><a href="#栈" class="headerlink" title="栈"></a>栈</h2><h3 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h3><p>线程是系统执行的最小单元，每个线程对象初始化时都会分配自己的栈空间储存函数执行过程中传递的参数和产生的变量 (当然上下文切换时，线程对象还会储存每个寄存器的值)    </p>
+<p>线程栈最关键的两个寄存器就是rbp和rsp(arm对应fp和sp)，栈的特点，数据从高地址向低地址填充(push入栈)        </p>
+<p>rsp: 当前线程栈空间的栈顶，从栈地址到rsp地址的空间都是没使用过的<br>rbp: 当前线程函数栈使用的空间地址，即rsp到rbp这部分空间是该函数使用的空间(函数参数或者函数中的声明的变量)</p>
+<p>以下是我之前写的创建线程的一个<a href="https://github.com/TannerJin/XNU/blob/master/thread/thread/Thread.swift" target="_blank" rel="noopener">demo</a>的一部分</p>
+<ol>
+<li><p>创建线程栈  </p>
+ <figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> stack_size: vm_size_t = vm_page_size * <span class="number">8</span></span><br><span class="line"><span class="keyword">var</span> stack_address: vm_address_t = <span class="number">0</span></span><br><span class="line"><span class="keyword">let</span> ret1 = vm_allocate(mach_task_self_, &amp;stack_address, stack_size, <span class="type">VM_MEMORY_STACK</span> | <span class="type">VM_FLAGS_ANYWHERE</span>)</span><br><span class="line"><span class="keyword">let</span> ret1_1 = vm_protect(mach_task_self_, stack_address, stack_size, <span class="number">1</span>, <span class="type">VM_PROT_READ</span> | <span class="type">VM_PROT_WRITE</span>)</span><br></pre></td></tr></table></figure>
+<p> vm_allocate创建一块虚拟内存区域，并设置为可读可写  </p>
+</li>
+<li><p>设置线程对象寄存器变量rsp指向栈顶，因为stack_address是低地址，需要加上栈大小  </p>
+ <figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 6 是xnu中_STRUCT_X86_THREAD_STATE64结构的rbp变量偏移</span></span><br><span class="line">state_64[<span class="number">6</span>] = <span class="type">UInt64</span>(stack_address+stack_size) - <span class="number">4</span>*<span class="number">0x8</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 7 是rsp变量偏移</span></span><br><span class="line">state_64[<span class="number">7</span>] = <span class="type">UInt64</span>(stack_address+stack_size) - <span class="number">7</span>*<span class="number">0x8</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h3 id="调用"><a href="#调用" class="headerlink" title="调用"></a>调用</h3><p>举个小函数调用栗子   </p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">sum</span><span class="params">(a: Int, b: Int)</span></span> -&gt; <span class="type">Int</span> &#123;</span><br><span class="line">	<span class="keyword">return</span> a+b</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> result = sum(a: <span class="number">1</span>, b: <span class="number">2</span>)</span><br><span class="line">result += <span class="number">1</span></span><br></pre></td></tr></table></figure>
+<p>伪指令  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">0x100000 call sum_label</span><br><span class="line">0x100004 add x0 #1</span><br><span class="line"></span><br><span class="line">sum_label:</span><br><span class="line">	push rbp</span><br><span class="line">	mov rsp rbp</span><br><span class="line">	sub 0x40 rsp</span><br><span class="line">	mov x0 -0x8(%rbp)</span><br><span class="line">	mov x1 -0x16(%rbp)</span><br><span class="line">	add x0 x1</span><br><span class="line">	add 0x40 rsp</span><br><span class="line">	pop rbp</span><br><span class="line">	ret</span><br></pre></td></tr></table></figure>
+<ol>
+<li><p>执行到 call sum_label 指令时，会先将当前指令的后面一条指令地址0x100004储存到栈上，在进行跳转 </p>
+<p> <img src="\images\research\stack_1.png" alt="">   </p>
+</li>
+<li><p>执行到push rbp 指令，将main函数的栈帧进行入栈保存，此时rsp = rsp - 8</p>
+<p> <img src="\images\research\stack_2.png" alt="">   </p>
+</li>
+<li><p>mov rsp rbp, 设置sum函数的栈帧</p>
+<p> <img src="\images\research\stack_3.png" alt=""></p>
+</li>
+<li><p>sub 0x40 rsp，rsp = rsp - 0x40, 给当前sum函数的参数和变量分配空间  </p>
+<p> <img src="\images\research\stack_4.png" alt="">    </p>
+</li>
+<li><p>mov x0 -0x8(%rbp)； mov x1 -0x16(%rbp) , 将参数a, b入栈，保存参数   </p>
+<p> <img src="\images\research\stack_5.png" alt=""></p>
+</li>
+<li><p>add x0 x1， a + b并将值保存到a(x0)中, 返回值储存在x0中   </p>
+</li>
+<li><p>add 0x40 rsp， 收回sum函数使用的栈空间    </p>
+<p> <img src="\images\research\stack_6.png" alt="">   </p>
+</li>
+<li><p>pop rbp，rbp出栈，rbp = main函数的栈帧， rsp = rsp + 8</p>
+<p> <img src="\images\research\stack_7.png" alt="">   </p>
+</li>
+<li><p>ret，pc = *(rsp) 0x100004, rsp = rsp + 8（栈溢出攻击点） </p>
+<p> <img src="\images\research\stack_8.png" alt=""> </p>
+</li>
+</ol>
+<h2 id="可执行文件格式"><a href="#可执行文件格式" class="headerlink" title="可执行文件格式"></a>可执行文件格式</h2><h3 id="iOS"><a href="#iOS" class="headerlink" title="iOS"></a>iOS</h3><h4 id="可执行文件格式和装载"><a href="#可执行文件格式和装载" class="headerlink" title="可执行文件格式和装载"></a>可执行文件格式和装载</h4><p><a href="https://tannerjin.github.io/2019/06/23/%E5%B7%A5%E4%BD%9C%E4%B8%80%E5%B9%B4%E6%9D%82%E8%B0%88/#%E5%8F%AF%E6%89%A7%E8%A1%8C%E6%96%87%E4%BB%B6-Mach-O-Dyld" target="_blank" rel="noopener">我之前的总结</a>    </p>
+<h4 id="符号动态链接"><a href="#符号动态链接" class="headerlink" title="符号动态链接"></a>符号动态链接</h4><ol>
+<li><strong>Symbol Dynamic Linking</strong> 我写的<a href="https://tannerjin.github.io/2019/09/25/AntiHook/#AntiFishHook" target="_blank" rel="noopener">AntiFishHook</a> 分析   </li>
+<li><strong>Export Symbol</strong>  <a href="https://tannerjin.github.io/2019/11/04/SRouter/" target="_blank" rel="noopener">SRouter</a>  这是我利用iOS动态库的symbol export实现的路由方案; dlsym函数原理   </li>
+<li><strong>Rebase</strong>  由于ALSR将代码段的数据在装载时整体进行随机偏移了vm_slide，因此要将函数指针的值加上vm _slide(数据段同理)</li>
+<li><strong>Symbol Table</strong> 可执行文件/动态库符号的信息，每个符号包括符号名偏移(String Table Index), 符号类型，符号所在的段和区，符号值，符号描述信息</li>
+</ol>
+<h2 id="调试-LLDB"><a href="#调试-LLDB" class="headerlink" title="调试(LLDB)"></a>调试(LLDB)</h2><h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><p>debugserver(拥有task _for _pid权限)通过系统调用task _for _pid获取到被调试的进程pid的task端口   </p>
+<p>得到目标进程task端口，就能通过系统调用干下面的事了(XNU)   </p>
+<p><strong>通信 :</strong><br>            1 .mach _msg系列函数进行进程通信</p>
+<p><strong>线程 :</strong>    </p>
+<pre><code>1. thread _get _state读取寄存器， thread _set _state修改寄存器  
+2. thread _suspend暂停线程(设置断点), thread _resume恢复线程   
+3. thread _info获取线程信息    
+</code></pre><p><strong>动态库信息 :</strong>    </p>
+<pre><code>1. task _get _dyld _image _infos等系列函数获取进程依赖库信息(image list)
+</code></pre><p><strong>虚拟内存 :</strong>   </p>
+<pre><code>1. mach _vm _region获取被调试进程虚拟内存区域   
+2. mach _vm _read，mach _vm _write读写进程的内存    
+</code></pre><p><strong>反编译 :</strong><br>    通过<strong>动态库信息</strong>和<strong>虚拟内存</strong>读取代码段内存内容以及符号表内容，再通过llvm反编译代码(lldb引入llvm)</p>
+<h3 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h3><p>我平常用的</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">dis -a address</span><br><span class="line">image list </span><br><span class="line">br s -a address</span><br><span class="line">register read x0</span><br><span class="line">register wirite x0 <span class="number">0x1</span></span><br><span class="line">bt</span><br><span class="line">po $x0</span><br><span class="line">x(memory read) address</span><br></pre></td></tr></table></figure>
+<h2 id="Hook"><a href="#Hook" class="headerlink" title="Hook"></a>Hook</h2><h3 id="函数指针hook"><a href="#函数指针hook" class="headerlink" title="函数指针hook"></a>函数指针hook</h3><p>修改数据段，替换函数指针</p>
+<h4 id="objc-imp-hook"><a href="#objc-imp-hook" class="headerlink" title="objc imp hook"></a>objc imp hook</h4><p>rumtime API</p>
+<h4 id="symbol-pointer-hook"><a href="#symbol-pointer-hook" class="headerlink" title="symbol pointer hook"></a>symbol pointer hook</h4><p><a href="https://github.com/facebook/fishhook" target="_blank" rel="noopener">fishhook</a> and <a href="https://github.com/TannerJin/anti-fishhook" target="_blank" rel="noopener">anti-fishhook</a></p>
+<h3 id="内联Hook-inline-hook"><a href="#内联Hook-inline-hook" class="headerlink" title="内联Hook(inline hook)"></a>内联Hook(inline hook)</h3><p>修改代码段, 一般替换函数头几个指令   </p>
+<h4 id="MSHookFuntion"><a href="#MSHookFuntion" class="headerlink" title="MSHookFuntion"></a>MSHookFuntion</h4><p><a href="http://www.cydiasubstrate.com/api/c/MSHookFunction/" target="_blank" rel="noopener">MSHookFuntion</a> and <a href="https://tannerjin.github.io/2019/09/25/AntiHook/#AntiMSHook" target="_blank" rel="noopener">AntiMSHookFunction</a>   </p>
+<h2 id="动态库注入"><a href="#动态库注入" class="headerlink" title="动态库注入"></a>动态库注入</h2><h3 id="原理-1"><a href="#原理-1" class="headerlink" title="原理"></a>原理</h3><p>父进程通过posix _spawn fork出子进程，通过hook posix _spawn函数插入环境变量DYLD _INSERT _LIBRARIES，在dyld加载的时候会判断该环境变量是否有值，如果有，则加载该变量的值(注入的动态库)   </p>
+<p>或者hook dyld的_main函数，修改环境变量参数envp</p>
+<h3 id="命令"><a href="#命令" class="headerlink" title="命令"></a>命令</h3><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">DYLD_INSERT_LIBRARIES</span> = insert.dylib</span><br></pre></td></tr></table></figure>
+<h2 id="重签名"><a href="#重签名" class="headerlink" title="重签名"></a>重签名</h2><h3 id="原理-2"><a href="#原理-2" class="headerlink" title="原理"></a>原理</h3><p><a href="https://www.cnblogs.com/scott-mr/p/7207096.html" target="_blank" rel="noopener">iOS签名</a><br>非对称加密，苹果后台拥有私钥，手机持有公钥<br>加密签名信息储存在可执行文件的Code Signature段中，通过手机本地公钥进行解密获取签名信息    </p>
+<h3 id="命令-1"><a href="#命令-1" class="headerlink" title="命令"></a>命令</h3><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">codesign -f -s identity ***.dylib</span><br><span class="line">codesign -f -s identity --entitlements entitlements.plist ***.app</span><br></pre></td></tr></table></figure>
+<h2 id="OLLVM混淆"><a href="#OLLVM混淆" class="headerlink" title="OLLVM混淆"></a>OLLVM混淆</h2><p>wait to do</p>
+<h2 id="额外"><a href="#额外" class="headerlink" title="额外"></a>额外</h2><p>书籍<br>《iOS应用逆向与安全》<br>《程序员的自我修养》<br>《深入解析Mac OS X &amp; iOS操作系统》</p>
+<p>源码<br>  dyld<br>  xnu   </p>
+<p>持续学习更新补充中。。。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/11/04/SRouter/" rel="next" title="SRouter">
+                <i class="fa fa-chevron-left"></i> SRouter
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="Tanner Jin" />
+            
+              <p class="site-author-name" itemprop="name">Tanner Jin</p>
+              <p class="site-description motion-element" itemprop="description">尘世间一迷途小码农</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/TannerJin" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/p/1005055237152442/home?from=page_100505&mod=TAB&is_hot=1#place" target="_blank" title="Weibo">
+                      
+                        <i class="fa fa-fw fa-Weibo"></i>Weibo</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#小端序标记法"><span class="nav-number">1.</span> <span class="nav-text">小端序标记法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#寄存器"><span class="nav-number">2.</span> <span class="nav-text">寄存器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#栈"><span class="nav-number">3.</span> <span class="nav-text">栈</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#初始化"><span class="nav-number">3.1.</span> <span class="nav-text">初始化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#调用"><span class="nav-number">3.2.</span> <span class="nav-text">调用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#可执行文件格式"><span class="nav-number">4.</span> <span class="nav-text">可执行文件格式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#iOS"><span class="nav-number">4.1.</span> <span class="nav-text">iOS</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#可执行文件格式和装载"><span class="nav-number">4.1.1.</span> <span class="nav-text">可执行文件格式和装载</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#符号动态链接"><span class="nav-number">4.1.2.</span> <span class="nav-text">符号动态链接</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#调试-LLDB"><span class="nav-number">5.</span> <span class="nav-text">调试(LLDB)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#原理"><span class="nav-number">5.1.</span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#常用命令"><span class="nav-number">5.2.</span> <span class="nav-text">常用命令</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hook"><span class="nav-number">6.</span> <span class="nav-text">Hook</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#函数指针hook"><span class="nav-number">6.1.</span> <span class="nav-text">函数指针hook</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#objc-imp-hook"><span class="nav-number">6.1.1.</span> <span class="nav-text">objc imp hook</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#symbol-pointer-hook"><span class="nav-number">6.1.2.</span> <span class="nav-text">symbol pointer hook</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#内联Hook-inline-hook"><span class="nav-number">6.2.</span> <span class="nav-text">内联Hook(inline hook)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#MSHookFuntion"><span class="nav-number">6.2.1.</span> <span class="nav-text">MSHookFuntion</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#动态库注入"><span class="nav-number">7.</span> <span class="nav-text">动态库注入</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#原理-1"><span class="nav-number">7.1.</span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#命令"><span class="nav-number">7.2.</span> <span class="nav-text">命令</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#重签名"><span class="nav-number">8.</span> <span class="nav-text">重签名</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#原理-2"><span class="nav-number">8.1.</span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#命令-1"><span class="nav-number">8.2.</span> <span class="nav-text">命令</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OLLVM混淆"><span class="nav-number">9.</span> <span class="nav-text">OLLVM混淆</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#额外"><span class="nav-number">10.</span> <span class="nav-text">额外</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tanner Jin</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
