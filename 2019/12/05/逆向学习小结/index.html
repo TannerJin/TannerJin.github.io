@@ -94,7 +94,7 @@
 <meta property="og:image" content="http://yoursite.com/images/research/stack_6.png">
 <meta property="og:image" content="http://yoursite.com/images/research/stack_7.png">
 <meta property="og:image" content="http://yoursite.com/images/research/stack_8.png">
-<meta property="og:updated_time" content="2019-12-10T07:09:12.148Z">
+<meta property="og:updated_time" content="2019-12-10T07:40:02.526Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="逆向学习小结">
 <meta name="twitter:description" content="根据《逆向工程核心原理》大致目录总结下自学iOS逆向工程所掌握的知识">
@@ -417,14 +417,13 @@
 <p><strong>线程 :</strong><br>thread _get _state读取寄存器(register read)， thread _set _state修改寄存器(register write)    </p>
 <pre><code>thread _(get)set _state的第二个参数thread _state _flavor _t 寄存器类型
 可以设置不同类型的寄存器(线程寄存器，debug寄存器，异常寄存器等), br断点操作设置了debug寄存器。xnu的x86 _debug _state结构          
-</code></pre><p>thread _suspend暂停线程, thread _resume恢复线程   </p>
-<p>thread _info获取线程信息    </p>
+</code></pre><p>thread _suspend暂停线程, thread _resume恢复线程<br>thread _info获取线程信息    </p>
 <p><strong>动态库信息 :</strong>    </p>
 <pre><code>1. task_info, task _get _dyld _image _infos等系列函数获取进程依赖库信息(image list)
 </code></pre><p><strong>虚拟内存 :</strong>   </p>
 <pre><code>1. mach _vm _region获取被调试进程虚拟内存区域   
 2. mach _vm _read，mach _vm _write读写进程的内存    
-</code></pre><p><strong>反编译 :</strong><br>    通过<strong>动态库信息</strong>和<strong>虚拟内存</strong>读取代码段内存内容以及符号表内容，再通过llvm反编译代码(lldb引入llvm)</p>
+</code></pre><p><strong>反编译 :</strong><br>    通过<strong>动态库信息</strong>和<strong>虚拟内存</strong>读取代码段内存内容以及符号表内容，再通过llvm反编译代码(lldb是llvm项目的一部分)</p>
 <h3 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h3><p>我平常用的</p>
 <figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">dis -a address</span><br><span class="line">image list </span><br><span class="line">br s -a address</span><br><span class="line">register read x0</span><br><span class="line">register wirite x0 <span class="number">0x1</span></span><br><span class="line">bt</span><br><span class="line">po $x0</span><br><span class="line">x(memory read) address</span><br></pre></td></tr></table></figure>
 <h2 id="Hook"><a href="#Hook" class="headerlink" title="Hook"></a>Hook</h2><h3 id="函数指针hook"><a href="#函数指针hook" class="headerlink" title="函数指针hook"></a>函数指针hook</h3><p>修改数据段，替换函数指针</p>
