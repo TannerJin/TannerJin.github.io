@@ -94,7 +94,7 @@
 <meta property="og:image" content="http://yoursite.com/images/research/stack_6.png">
 <meta property="og:image" content="http://yoursite.com/images/research/stack_7.png">
 <meta property="og:image" content="http://yoursite.com/images/research/stack_8.png">
-<meta property="og:updated_time" content="2019-12-06T09:28:58.847Z">
+<meta property="og:updated_time" content="2019-12-10T07:09:12.148Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="逆向学习小结">
 <meta name="twitter:description" content="根据《逆向工程核心原理》大致目录总结下自学iOS逆向工程所掌握的知识">
@@ -400,7 +400,7 @@
 <li><p>pop rbp，rbp出栈，rbp = main函数的栈帧， rsp = rsp + 8</p>
 <p> <img src="\images\research\stack_7.png" alt="">   </p>
 </li>
-<li><p>ret，pc = *(rsp) 0x100004, rsp = rsp + 8（栈溢出攻击点） </p>
+<li><p>ret，pc = *(rsp) 0x100004, rsp = rsp + 8（栈溢出攻击点或者泄露指令地址(0x100004)，得到ASLR） </p>
 <p> <img src="\images\research\stack_8.png" alt=""> </p>
 </li>
 </ol>
@@ -408,18 +408,19 @@
 <h4 id="符号动态链接"><a href="#符号动态链接" class="headerlink" title="符号动态链接"></a>符号动态链接</h4><ol>
 <li><strong>Symbol Dynamic Linking</strong> 我写的<a href="https://tannerjin.github.io/2019/09/25/AntiHook/#AntiFishHook" target="_blank" rel="noopener">AntiFishHook</a> 分析   </li>
 <li><strong>Export Symbol</strong>  <a href="https://tannerjin.github.io/2019/11/04/SRouter/" target="_blank" rel="noopener">SRouter</a>  这是我利用iOS动态库的symbol export实现的路由方案; dlsym函数原理   </li>
-<li><strong>Rebase</strong>  由于ALSR将代码段的数据在装载时整体进行随机偏移了vm_slide，因此要将函数指针的值加上vm _slide(数据段同理)</li>
+<li><strong>Rebase</strong>  由于ASLR将代码段的数据在装载时整体进行随机偏移了vm_slide，因此要将函数指针的值加上vm _slide(数据段同理)</li>
 <li><strong>Symbol Table</strong> 可执行文件/动态库符号的信息，每个符号包括符号名偏移(String Table Index), 符号类型，符号所在的段和区，符号值，符号描述信息</li>
 </ol>
 <h2 id="调试-LLDB"><a href="#调试-LLDB" class="headerlink" title="调试(LLDB)"></a>调试(LLDB)</h2><h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><p>debugserver(拥有task _for _pid权限)通过系统调用task _for _pid获取到被调试的进程pid的task端口   </p>
 <p>得到目标进程task端口，就能通过系统调用干下面的事了(XNU)   </p>
 <p><strong>通信 :</strong><br>            1 .mach _msg系列函数进行进程通信</p>
-<p><strong>线程 :</strong>    </p>
-<pre><code>1. thread _get _state读取寄存器， thread _set _state修改寄存器  
-2. thread _suspend暂停线程(设置断点), thread _resume恢复线程   
-3. thread _info获取线程信息    
-</code></pre><p><strong>动态库信息 :</strong>    </p>
-<pre><code>1. task _get _dyld _image _infos等系列函数获取进程依赖库信息(image list)
+<p><strong>线程 :</strong><br>thread _get _state读取寄存器(register read)， thread _set _state修改寄存器(register write)    </p>
+<pre><code>thread _(get)set _state的第二个参数thread _state _flavor _t 寄存器类型
+可以设置不同类型的寄存器(线程寄存器，debug寄存器，异常寄存器等), br断点操作设置了debug寄存器。xnu的x86 _debug _state结构          
+</code></pre><p>thread _suspend暂停线程, thread _resume恢复线程   </p>
+<p>thread _info获取线程信息    </p>
+<p><strong>动态库信息 :</strong>    </p>
+<pre><code>1. task_info, task _get _dyld _image _infos等系列函数获取进程依赖库信息(image list)
 </code></pre><p><strong>虚拟内存 :</strong>   </p>
 <pre><code>1. mach _vm _region获取被调试进程虚拟内存区域   
 2. mach _vm _read，mach _vm _write读写进程的内存    
