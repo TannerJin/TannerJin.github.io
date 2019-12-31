@@ -393,7 +393,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/12/16/iOS内存-内核-xnu:vm/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/12/16/iOS内存-xnu内核虚拟内存设计/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Tanner Jin">
@@ -412,7 +412,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2019/12/16/iOS内存-内核-xnu:vm/" itemprop="url">iOS内存-内核(xnu/vm)</a></h1>
+                <a class="post-title-link" href="/2019/12/16/iOS内存-xnu内核虚拟内存设计/" itemprop="url">iOS内存-xnu内核虚拟内存设计</a></h1>
         
 
         <div class="post-meta">
@@ -1489,7 +1489,8 @@
       
         
           
-            <h2 id="xnu虚拟内存设计"><a href="#xnu虚拟内存设计" class="headerlink" title="xnu虚拟内存设计"></a><a href="">xnu虚拟内存设计</a></h2><h2 id="栈"><a href="#栈" class="headerlink" title="栈"></a><a href="">栈</a></h2><h2 id="libmalloc-堆"><a href="#libmalloc-堆" class="headerlink" title="(libmalloc)堆"></a><a href="">(libmalloc)堆</a></h2><h3 id="S-Zone"><a href="#S-Zone" class="headerlink" title="S-Zone"></a><a href="">S-Zone</a></h3><h3 id="nano-zone"><a href="#nano-zone" class="headerlink" title="nano-zone"></a><a href="">nano-zone</a></h3><h3 id="nano-zonev2"><a href="#nano-zonev2" class="headerlink" title="nano-zonev2"></a><a href="">nano-zonev2</a></h3><h3 id="代码及数据区"><a href="#代码及数据区" class="headerlink" title="代码及数据区"></a><a href="">代码及数据区</a></h3>
+             <a id="more"></a> 
+<h2 id="xnu内核虚拟内存设计"><a href="#xnu内核虚拟内存设计" class="headerlink" title="xnu内核虚拟内存设计"></a><a href="https://tannerjin.github.io/2019/12/16/iOS%E5%86%85%E5%AD%98-%E5%86%85%E6%A0%B8-xnu:vm/" target="_blank" rel="noopener">xnu内核虚拟内存设计</a></h2><h2 id="栈"><a href="#栈" class="headerlink" title="栈"></a><a href="https://tannerjin.github.io/2019/12/16/iOS%E5%86%85%E5%AD%98-%E6%A0%88/" target="_blank" rel="noopener">栈</a></h2><h2 id="libmalloc-堆设计"><a href="#libmalloc-堆设计" class="headerlink" title="(libmalloc 堆设计"></a><a href="https://tannerjin.github.io/2019/12/16/iOS%E5%86%85%E5%AD%98-%E5%A0%86-libmalloc-%E7%AE%80%E4%BB%8B/" target="_blank" rel="noopener">(libmalloc 堆设计</a></h2><h3 id="libmalloc-S-Zone"><a href="#libmalloc-S-Zone" class="headerlink" title="libmalloc S-Zone"></a><a href="https://tannerjin.github.io/2019/12/16/iOS%E5%86%85%E5%AD%98-%E4%BB%A3%E7%A0%81%E5%8F%8A%E6%95%B0%E6%8D%AE%E5%8C%BA/" target="_blank" rel="noopener">libmalloc S-Zone</a></h3><h3 id="libmalloc-nano-zone"><a href="#libmalloc-nano-zone" class="headerlink" title="libmalloc nano-zone"></a><a href="https://tannerjin.github.io/2019/12/16/iOS%E5%86%85%E5%AD%98-%E5%A0%86-libmalloc-nano-zone/" target="_blank" rel="noopener">libmalloc nano-zone</a></h3><h3 id="libmalloc-nano-zonev2"><a href="#libmalloc-nano-zonev2" class="headerlink" title="libmalloc nano-zonev2"></a><a href="https://tannerjin.github.io/2019/12/16/iOS%E5%86%85%E5%AD%98-%E5%A0%86-libmalloc-nanov2-zone/" target="_blank" rel="noopener">libmalloc nano-zonev2</a></h3><h3 id="堆和ARC"><a href="#堆和ARC" class="headerlink" title="堆和ARC"></a><a href="https://tannerjin.github.io/2019/12/16/iOS%E5%86%85%E5%AD%98-%E5%A0%86-objc-ARC/" target="_blank" rel="noopener">堆和ARC</a></h3><h3 id="代码及数据区"><a href="#代码及数据区" class="headerlink" title="代码及数据区"></a><a href="https://tannerjin.github.io/2019/12/16/iOS%E5%86%85%E5%AD%98-%E4%BB%A3%E7%A0%81%E5%8F%8A%E6%95%B0%E6%8D%AE%E5%8C%BA/" target="_blank" rel="noopener">代码及数据区</a></h3>
           
         
       
@@ -1735,7 +1736,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-count">8</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
