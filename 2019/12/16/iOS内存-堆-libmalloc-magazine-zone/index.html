@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="scalable_zone是zone其中一种类型, 分配堆内存管理者，malloc，free等函数真正的入口">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS内存-堆(libmalloc)-scalable_zone">
+<meta property="og:url" content="http://yoursite.com/2019/12/16/iOS内存-堆-libmalloc-magazine-zone/index.html">
+<meta property="og:site_name" content="Tanner Jin">
+<meta property="og:description" content="scalable_zone是zone其中一种类型, 分配堆内存管理者，malloc，free等函数真正的入口">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/images/scalable_zone/s_zone.png">
+<meta property="og:image" content="http://yoursite.com/images/scalable_zone/magazine.png">
+<meta property="og:image" content="http://yoursite.com/images/scalable_zone/heap_region.png">
+<meta property="og:image" content="http://yoursite.com/images/scalable_zone/s_zone&heap_region.png">
+<meta property="og:image" content="http://yoursite.com/images/scalable_zone/free_lists.png">
+<meta property="og:image" content="http://yoursite.com/images/scalable_zone/zone.png">
+<meta property="og:image" content="http://yoursite.com/images/scalable_zone/last_heap_region.png">
+<meta property="og:image" content="http://yoursite.com/images/scalable_zone/blocks_bitmap.png">
+<meta property="og:image" content="http://yoursite.com/images/scalable_zone/tiny_get_region_from_depot1.png">
+<meta property="og:image" content="http://yoursite.com/images/scalable_zone/tiny_get_region_from_depot2.png">
+<meta property="og:image" content="http://yoursite.com/images/scalable_zone/pre_coalesce1.png">
+<meta property="og:image" content="http://yoursite.com/images/scalable_zone/pre_coalesce2.png">
+<meta property="og:image" content="http://yoursite.com/images/scalable_zone/next_coalesce1.png">
+<meta property="og:image" content="http://yoursite.com/images/scalable_zone/next_coalesce2.png">
+<meta property="og:updated_time" content="2019-12-31T09:15:48.140Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iOS内存-堆(libmalloc)-scalable_zone">
+<meta name="twitter:description" content="scalable_zone是zone其中一种类型, 分配堆内存管理者，malloc，free等函数真正的入口">
+<meta name="twitter:image" content="http://yoursite.com/images/scalable_zone/s_zone.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/12/16/iOS内存-堆-libmalloc-magazine-zone/"/>
+
+
+
+
+
+  <title>iOS内存-堆(libmalloc)-scalable_zone | Tanner Jin</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Tanner Jin</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/12/16/iOS内存-堆-libmalloc-magazine-zone/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Tanner Jin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tanner Jin">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">iOS内存-堆(libmalloc)-scalable_zone</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-16T17:42:07+08:00">
+                2019-12-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/内存/" itemprop="url" rel="index">
+                    <span itemprop="name">内存</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><strong>scalable_zone</strong>是zone其中一种类型, 分配堆内存管理者，malloc，free等函数真正的入口    </p>
+<a id="more"></a>    
+<h1 id="SZone"><a href="#SZone" class="headerlink" title="SZone"></a>SZone</h1><p>在<strong>zone</strong>中，会根据申请的堆大小选择不同rack进行分配</p>
+<blockquote>
+<p><strong>zone</strong>和<strong>rack</strong>关系如下图   </p>
+</blockquote>
+<p><img src="\images\scalable_zone\s_zone.png" alt="">   </p>
+<p> <strong>scalable_zone</strong>即<strong>s_zone</strong>, 拥有三个Rack_S对象，分别用来处理不同大小的堆内存操作   </p>
+<ul>
+<li>tiny _rack 处理小于1009字节的分配   </li>
+<li>small _rack 处理1009B~32KB的分配(iOS 1009B~15KB)   </li>
+<li>medium_rack 处理32(iOS 15)KB~8M的分配   </li>
+<li>(如果大于8M内存的申请，则通过系统调用申请)      </li>
+</ul>
+<p>相关函数    </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">create_scalable_szone   	 <span class="comment">//  创建zone</span></span><br><span class="line">szone_malloc   			     <span class="comment">// zone malloc函数入口</span></span><br><span class="line">szone_malloc_should_clear    <span class="comment">// 在这判断大小选择rack</span></span><br></pre></td></tr></table></figure>
+<h1 id="Rack"><a href="#Rack" class="headerlink" title="Rack"></a>Rack</h1><p>在<strong>rack</strong>中，会根据当前运行线程的所在的核选择不同Magazine进行分配   </p>
+<blockquote>
+<p><strong>rack</strong>和<strong>magazine</strong>关系如下</p>
+</blockquote>
+<p><img src="\images\scalable_zone\magazine.png" alt="">  </p>
+<p> <strong>rack</strong>的属性<code>magazine*</code>指向的是magazine数组。该数组内存区域通过系统调用<code>mach_vm_map</code>申请, 申请大小magazine数组数量+1    </p>
+<p> magazines数量即<code>rack</code>的<code>num_magazines</code>属性如何确定呢? 以及为什么+1，多出来的那个magazine用来干啥的？   </p>
+<blockquote>
+<p><strong><code>num_magazines</code></strong>由当前主机CPU核数决定. 如果CPU核数没有设置，<code>num_magazines=1</code>，如果大于1小于64，则取CPU核数值，如果大于64，则取64; 这么设计的目的是为了真正并发的性能</p>
+<ul>
+<li>多核上多线程通过操作不同的magazine(对内存的malloc和free等), 可以减少lock的使用   </li>
+<li>让多核CPU的缓存得到充分利用，每个核拥有自己的多级缓存</li>
+</ul>
+</blockquote>
+<blockquote>
+<p><strong><code>+1</code></strong> 是为了给magazines数组加上一个<code>depot magazine</code>, 放置在数组的首位置上，并且<code>rack</code>的<code>magazines</code>指向magazines数组第2个元素的位置   </p>
+</blockquote>
+<ul>
+<li><code>depot magazine</code>是当前线程所在的核对应的magazine无法分配出heap空间时，会通过<code>depot magazine</code>分配。分配出的空间地址对应的heap region会添加到当前magazine中，在free block块合并的时候，也会给<code>depot magazine</code>添加heap region. 当然后面会详细讲   </li>
+</ul>
+<p>相关函数</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">rack_init    <span class="comment">// 初始化rack和创建magazines</span></span><br><span class="line">tiny_malloc_should_clear       <span class="comment">// 选择tiny_rack magazine</span></span><br><span class="line">small_malloc_should_clear      <span class="comment">// 选择small_rack magazine</span></span><br></pre></td></tr></table></figure>
+<h1 id="Magazine"><a href="#Magazine" class="headerlink" title="Magazine"></a>Magazine</h1><p><strong>magazine</strong>是真正操作堆内存的对象   </p>
+<blockquote>
+<p>magazine的结构如下, 其中每个属性注释在后面的malloc和free过程中都会说到   </p>
+</blockquote>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">magazine_s</span> &#123;</span></span><br><span class="line">	_malloc_lock_s magazine_lock MALLOC_CACHE_ALIGN;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 当前是否在向内核申请heap region</span></span><br><span class="line">	<span class="keyword">volatile</span> <span class="keyword">boolean_t</span> alloc_underway;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 最后一次free的地址和大小</span></span><br><span class="line">	<span class="keyword">void</span> *mag_last_free;</span><br><span class="line">	<span class="keyword">msize_t</span> mag_last_free_msize;	</span><br><span class="line">	<span class="comment">// 最后一次free的地址所在的heap region</span></span><br><span class="line">	<span class="keyword">region_t</span> mag_last_free_rgn; </span><br><span class="line"></span><br><span class="line">	<span class="comment">// 空闲链表数组</span></span><br><span class="line">	<span class="keyword">free_list_t</span> mag_free_list[MAGAZINE_FREELIST_SLOTS];  <span class="comment">// MAGAZINE_FREELIST_SLOTS =&gt; 256</span></span><br><span class="line">	<span class="comment">// 空闲链表数组bit信息</span></span><br><span class="line">	<span class="keyword">uint32_t</span> mag_bitmap[MAGAZINE_FREELIST_BITMAP_WORDS]; <span class="comment">// MAGAZINE_FREELIST_BITMAP_WORDS =&gt; 8</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 最后申请的heap region中未使用的大小</span></span><br><span class="line">	<span class="keyword">size_t</span> mag_bytes_free_at_end;</span><br><span class="line">	<span class="comment">// 最后申请的heap region的随机起始偏移未使用的大小(ASLR)</span></span><br><span class="line">	<span class="keyword">size_t</span> mag_bytes_free_at_start;</span><br><span class="line">	<span class="comment">// 最后一次向内核申请的heap region地址</span></span><br><span class="line">	<span class="keyword">region_t</span> mag_last_region;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// magazine已经分配出去的大小</span></span><br><span class="line">	<span class="keyword">size_t</span> mag_num_bytes_in_objects;</span><br><span class="line">	<span class="comment">// magazine总共的heap大小(包括分配的和未分配的)</span></span><br><span class="line">	<span class="keyword">size_t</span> num_bytes_in_magazine;</span><br><span class="line">	<span class="comment">// heap region 数量</span></span><br><span class="line">	<span class="keyword">unsigned</span> mag_num_objects;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// heap regions metadata双向链表首尾节点</span></span><br><span class="line">	<span class="keyword">unsigned</span> recirculation_entries;</span><br><span class="line">	<span class="keyword">region_trailer_t</span> *firstNode;</span><br><span class="line">	<span class="keyword">region_trailer_t</span> *lastNode;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 页填充无用数据</span></span><br><span class="line">	<span class="keyword">uintptr_t</span> pad[<span class="number">320</span> - <span class="number">14</span> - MAGAZINE_FREELIST_SLOTS -</span><br><span class="line">			(MAGAZINE_FREELIST_BITMAP_WORDS + <span class="number">1</span>) / <span class="number">2</span>];</span><br><span class="line">&#125; <span class="keyword">magazine_t</span>;</span><br></pre></td></tr></table></figure>
+<h2 id="Heap-Region"><a href="#Heap-Region" class="headerlink" title="Heap Region"></a>Heap Region</h2><p><strong>堆内存</strong> heap region是用户态malloc内存真正的区域   </p>
+<h3 id="设计"><a href="#设计" class="headerlink" title="设计"></a>设计</h3><p>数据结构如下</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">tiny_region</span> &#123;</span></span><br><span class="line">	<span class="comment">// Data; malloc申请的空间在这里面</span></span><br><span class="line">	<span class="keyword">tiny_block_t</span> blocks[NUM_TINY_BLOCKS];   <span class="comment">// sizeof(tiny_block_t) =&gt; 16;  NUM_TINY_BLOCKS =&gt; 64520</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// Meta_Data;</span></span><br><span class="line">	<span class="keyword">region_trailer_t</span> trailer;</span><br><span class="line">	<span class="keyword">tiny_header_inuse_pair_t</span> pairs[CEIL_NUM_TINY_BLOCKS_WORDS];  <span class="comment">// blocks对应的bitmap</span></span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 对齐用的无用空间</span></span><br><span class="line">	<span class="keyword">uint8_t</span> pad[TINY_REGION_SIZE - (NUM_TINY_BLOCKS * <span class="keyword">sizeof</span>(<span class="keyword">tiny_block_t</span>)) - TINY_METADATA_SIZE];</span><br><span class="line">&#125; * <span class="keyword">tiny_region_t</span></span><br></pre></td></tr></table></figure>
+<p>tiny_region布局结构如下   </p>
+<p><img src="\images\scalable_zone\heap_region.png" alt=""></p>
+<p>tiny_region通过系统调用<code>mach_vm_map</code>分配, 分配出来的空间划分为两部分   </p>
+<ul>
+<li><p>Data   </p>
+<blockquote>
+<p>data区按照16个字节作为一个block, block也是malloc申请的最小单位<br>block也刚好能存储两个指针数据，可以作为空闲链表的一个节点</p>
+</blockquote>
+</li>
+<li><p>MetaData    </p>
+<blockquote>
+<p>metaData存储着data区的使用情况(bitmap)以及heap_region prev和next的metaData指针(双向链表)</p>
+</blockquote>
+</li>
+</ul>
+<h3 id="和magazine的关系"><a href="#和magazine的关系" class="headerlink" title="和magazine的关系"></a>和magazine的关系</h3><ul>
+<li><strong>magazine</strong>的<code>firstNode</code>和<code>lastNode</code>指向heap region metaData双向链表的第一个和最后一个节点   </li>
+<li><strong>magazine</strong>的 <code>mag_last_region</code>指向最后一次magazine向内核申请的heap region</li>
+</ul>
+<blockquote>
+<p>描述如下图</p>
+</blockquote>
+<p><img src="\images\scalable_zone\s_zone&amp;heap_region.png" alt="">   </p>
+<h2 id="Last-Free"><a href="#Last-Free" class="headerlink" title="Last_Free"></a>Last_Free</h2><p><code>magazine</code>的<code>last_free等属性</code>储存着该<code>magazine</code>最后一次free的block块地址，块大小，以及块地址的<code>heap region</code>地址</p>
+<h2 id="Free-Lists"><a href="#Free-Lists" class="headerlink" title="Free_Lists"></a>Free_Lists</h2><p><code>free_lists</code>是<code>magazine</code>的空闲链表数组，空闲链表数组的元素按照块大小递增   </p>
+<blockquote>
+<p>对于<strong>tiny_rack</strong>最多分配1008个字节，因此该rack下的每个magazine的空闲链表数组个数最大为1008/16 + 1 = 64，即第1个空闲链表的节点内存大小为1block(=16B), 第2个空闲链表的节点内存大小为2blocks(=32B)…第63个空闲链表的节点内存为63blocks(=1008B), <strong>最后一个第64个空闲链表的节点内存大于等于64blocks(&gt;=1024B，该链表节点是free时合并产生)</strong>    </p>
+</blockquote>
+<p>magazine中的空闲链表数组结构如下   </p>
+<p><img src="\images\scalable_zone\free_lists.png" alt="">   </p>
+<ul>
+<li><p>对于16B空闲链表的节点，只存储前驱和后继节点指针</p>
+</li>
+<li><p>对于大于16字节小于等于1008B空闲链表的节点，前面16字节存储前驱和后继指针，指针后两个字节存储块大小(如图，在free过程中向下一个block合并时用到), 最后两个字节也储存着块大小数据(在free过程中向上一个block合并时用到). 对应函数<code>TINY_FREE_SIZE</code></p>
+</li>
+<li><p>对于最后一个空闲链表，<strong>每个节点都是大于等于1024B</strong>. 其他指针，块大小数据布局同上.</p>
+</li>
+</ul>
+<h1 id="SZone架构总结"><a href="#SZone架构总结" class="headerlink" title="SZone架构总结"></a>SZone架构总结</h1><p>整个宏观的架构设计就解释到这了，如下图   </p>
+<p><img src="\images\scalable_zone\zone.png" alt="">  </p>
+<p>当然上面的解释还是太宏观了，很多巧妙的设计操作以及分配策略都没有提及，接下来就看看具体的malloc和free操作</p>
+<hr>
+<h1 id="Malloc-and-Free"><a href="#Malloc-and-Free" class="headerlink" title="Malloc and Free"></a>Malloc and Free</h1><h2 id="tiny-malloc"><a href="#tiny-malloc" class="headerlink" title="tiny_malloc"></a>tiny_malloc</h2><p><code>tiny_malloc_should_clear</code> 是整个分配流程, 在函数<code>szone_malloc_should_clear</code>中通过判断申请的内存大小调用的，当申请大小小于1009个字节时调用   </p>
+<p> <strong>msize</strong>   </p>
+<blockquote>
+<p>msize表示block申请大小单位，1表示申请1个block，16字节。当申请大小不满16B，也分配1个block，申请大于一个小于两个block，分配2个block, 以此类推… </p>
+</blockquote>
+<blockquote>
+<p>具体实现: msize = (size+15) &gt;&gt; 4 即 msize = (size+15)/16   </p>
+</blockquote>
+<p>整个分配简介流程如下，后面对每个步骤过程会详细介绍   </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> *</span><br><span class="line">tiny_malloc_should_clear(<span class="keyword">rack_t</span> *rack, <span class="keyword">msize_t</span> msize, <span class="keyword">boolean_t</span> cleared_requested) &#123;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 1</span></span><br><span class="line">	<span class="keyword">void</span> *ptr;</span><br><span class="line">	<span class="keyword">mag_index_t</span> mag_index = tiny_mag_get_thread_index() % rack-&gt;num_magazines;</span><br><span class="line">	<span class="keyword">magazine_t</span> *tiny_mag_ptr = &amp;(rack-&gt;magazines[mag_index]);</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 2. </span></span><br><span class="line">	ptr = tiny_mag_ptr-&gt;mag_last_free;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">if</span> (tiny_mag_ptr-&gt;mag_last_free_msize == msize) &#123;</span><br><span class="line">		tiny_mag_ptr-&gt;mag_last_free = <span class="literal">NULL</span>;</span><br><span class="line">		tiny_mag_ptr-&gt;mag_last_free_msize = <span class="number">0</span>;</span><br><span class="line">		tiny_mag_ptr-&gt;mag_last_free_rgn = <span class="literal">NULL</span>;</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">if</span> (cleared_requested) &#123;</span><br><span class="line">			<span class="built_in">memset</span>(ptr, <span class="number">0</span>, TINY_BYTES_FOR_MSIZE(msize));</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> ptr;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 3.</span></span><br><span class="line">	ptr = tiny_malloc_from_free_list(rack, tiny_mag_ptr, mag_index, msize);</span><br><span class="line">	<span class="keyword">if</span> (ptr) &#123;</span><br><span class="line">		<span class="keyword">if</span> (cleared_requested) &#123;</span><br><span class="line">			<span class="built_in">memset</span>(ptr, <span class="number">0</span>, TINY_BYTES_FOR_MSIZE(msize));</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> ptr;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 4.</span></span><br><span class="line">	<span class="keyword">if</span> (tiny_get_region_from_depot(rack, tiny_mag_ptr, mag_index, msize)) &#123;</span><br><span class="line">		ptr = tiny_malloc_from_free_list(rack, tiny_mag_ptr, mag_index, msize);</span><br><span class="line">		<span class="keyword">if</span> (ptr) &#123;</span><br><span class="line">			<span class="keyword">if</span> (cleared_requested) &#123;</span><br><span class="line">				<span class="built_in">memset</span>(ptr, <span class="number">0</span>, TINY_BYTES_FOR_MSIZE(msize));</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">return</span> ptr;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 5.</span></span><br><span class="line">	<span class="keyword">void</span> *fresh_region;</span><br><span class="line">	fresh_region = mvm_allocate_pages_securely(TINY_REGION_SIZE, TINY_BLOCKS_ALIGN, VM_MEMORY_MALLOC_TINY, rack-&gt;debug_flags);</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">if</span> (!fresh_region) &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	ptr = tiny_malloc_from_region_no_lock(rack, tiny_mag_ptr, mag_index, msize, fresh_region);</span><br><span class="line">	<span class="keyword">return</span> ptr</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<ol>
+<li><code>current magazine</code> 根据当前线程找到tiny_rack对应tiny _magazine, 之后的分配流程操作会基于该magazine</li>
+<li><code>last_free</code> 判断该magazine的last_free cache大小和申请大小是否匹配，如果匹配，则分配该地址</li>
+<li><code>free_list of curretn magazine</code> 2步骤失败，通过magazine的空闲链表分配</li>
+<li><code>free_list of depot magazine</code> 3步骤失败，通过tiny _rack的depot _magazine的空闲链表分配</li>
+<li><code>mmap</code> 4步骤失败，通过系统调用向内核申请一块heap region, 并从中分配</li>
+<li><code>return nil</code> 5步骤失败，return nil</li>
+</ol>
+</blockquote>
+<p>大致过程就介绍到这了，如果对细节不敢兴趣，可以直接跳到<code>tiny_free</code>了解free的过程   </p>
+<p>下面开始介绍详细过程</p>
+<h3 id="1-current-magazine"><a href="#1-current-magazine" class="headerlink" title="1. current magazine"></a>1. current magazine</h3><p>函数<code>tiny_mag_get_thread_index</code> 根据当前线程所在的CPU核，获取<code>tiny_rack</code>的<code>magazines</code>的偏移，从而得到当前核的<code>magazine</code></p>
+<h3 id="2-last-free"><a href="#2-last-free" class="headerlink" title="2. last_free"></a>2. last_free</h3><p><code>magazine</code>属性<code>mag_last_free</code>, 表示该<code>magazine</code>最后一次free的地址(没有添加到空闲链表中)</p>
+<p>通过上一步得到的magazine，判断magazine的<code>mag_last_free_msize</code>和当前申请大小(转换成msize)是否匹配, 如果匹配，则返回该地址<code>mag_last_free</code></p>
+<p>验证demo</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span>* ptr1 = <span class="built_in">malloc</span>(<span class="number">16</span>);    <span class="comment">// msize = 1</span></span><br><span class="line"><span class="built_in">printf</span>(<span class="string">"%p\n"</span>, ptr1);</span><br><span class="line"><span class="built_in">free</span>(ptr1);</span><br><span class="line"><span class="keyword">void</span>* ptr2 = <span class="built_in">malloc</span>(<span class="number">1</span>);     <span class="comment">// msize = 1</span></span><br><span class="line"><span class="built_in">printf</span>(<span class="string">"%p\n"</span>, ptr2);</span><br></pre></td></tr></table></figure>
+<p>打印可以发现ptr1和ptr2是同一地址   </p>
+<blockquote>
+<p>漏洞利用<br>如果<code>cleared_requested</code>为false, 那么mag _last _free分配出来的内存的内容不会被清除，还是上一个对象的内容</p>
+</blockquote>
+<h3 id="3-free-list-of-curretn-magazine-重点"><a href="#3-free-list-of-curretn-magazine-重点" class="headerlink" title="3. free_list of curretn magazine(重点)"></a>3. free_list of curretn magazine(重点)</h3><p>函数<code>tiny_malloc_from_free_list</code>从当前<code>magazine</code>的空闲链表和<code>last heap region</code>中分配空间</p>
+<p>从空闲链表分配也有好几个步骤    </p>
+<blockquote>
+<ol>
+<li><code>free_list of msize</code> 找到msize对应大小的空闲链表(之前说过magazine拥有空闲链表数组)，有节点，直接分配头节点</li>
+</ol>
+</blockquote>
+<blockquote>
+<ol start="2">
+<li><code>first free_list which is more than msize and has node</code> 1步骤失败，找到第一个比msize大, 节点不为空的空闲链表(bit操作)；有节点，分配节点，并将多余的块大小添加到对应的空闲链表中</li>
+</ol>
+</blockquote>
+<blockquote>
+<ol start="3">
+<li><code>last free_list</code> 查看空闲链表数组的最后一个空闲链表(节点内存大于1008B)是否有节点，如果有，则分配，并将多余的块大小添加到对应的空闲链表中</li>
+</ol>
+</blockquote>
+<blockquote>
+<ol start="4">
+<li><code>last heap region</code> 2，3步骤失败，表示当前magazine的空闲链表数组中比申请msize大的空闲链表都没有节点.<br>从<code>mag_last_region</code>中申请内存，该heap region 是该magazine最后一次向内核申请的堆内存区域，有些内存block还没有用过(free过的存在空闲链表中)</li>
+</ol>
+</blockquote>
+<blockquote>
+<ol start="5">
+<li>4步骤失败，表示最后一块heap内存区域也没有多余的空间了，整个大的步骤结束</li>
+</ol>
+</blockquote>
+<blockquote>
+<ol start="6">
+<li><code>return_tiny_alloc</code>如果申请成功，做一些收尾工作，即将节点从空闲链表中移除，将多余的块作为节点添加到对应的空闲链表中，设置block对应的bitmap信息</li>
+</ol>
+</blockquote>
+<p><strong>下面是从空闲链表分配的详细过程</strong>    </p>
+<h4 id="1-从空闲链表数组中找到大小匹配的空闲链表"><a href="#1-从空闲链表数组中找到大小匹配的空闲链表" class="headerlink" title="1. 从空闲链表数组中找到大小匹配的空闲链表"></a>1. 从空闲链表数组中找到大小匹配的空闲链表</h4><ol>
+<li><p>获取申请大小msize对应的空闲链表偏移(slot)，得到对应msize的空闲链表</p>
+ <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">inline</span> <span class="keyword">grain_t</span></span><br><span class="line">tiny_slot_from_msize(<span class="keyword">msize_t</span> msize)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">// msize &gt; 63(tiny limit) ? 63 : msize-1</span></span><br><span class="line">	<span class="keyword">return</span> (!msize || (msize &gt; NUM_TINY_SLOTS) ? NUM_TINY_SLOTS : msize - <span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<ol start="2">
+<li><p>如果空闲链表有节点，该节点为这次申请内存地址，并将该节点从该空闲链表移除. 移除该节点，空闲链表如果没有节点，设置空闲链表metadata的bitmap对应的bit位为0  </p>
+ <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (next) &#123;</span><br><span class="line">	next-&gt;previous = ptr-&gt;previous;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">	BITMAPV_CLR(tiny_mag_ptr-&gt;mag_bitmap, slot);  <span class="comment">// 设置bit位</span></span><br><span class="line">&#125;</span><br><span class="line">the_slot-&gt;p = next;   <span class="comment">// (将空闲链表指向下一节点)</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<blockquote>
+<p>这里的tiny_malloc的bitmap用了8个字节64bit位表示该magazine的64个空闲链表，0表示链表无节点，1表示有链表节点</p>
+</blockquote>
+<ol start="3">
+<li>如果该空闲链表没有节点，接着走下面流程👇   </li>
+</ol>
+<h4 id="2-从第一个大于申请msize的空闲链表申请"><a href="#2-从第一个大于申请msize的空闲链表申请" class="headerlink" title="2. 从第一个大于申请msize的空闲链表申请"></a>2. 从第一个大于申请msize的空闲链表申请</h4><p>比如申请的msize为2，但是msize为2对应的空闲链表没有节点，这时候查看msize为3，4，5…63的空闲链表</p>
+<ol>
+<li><p>取出表示大于msize的bitmap  </p>
+ <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bitmap = ((<span class="keyword">uint64_t</span> *)(tiny_mag_ptr-&gt;mag_bitmap))[<span class="number">0</span>] &amp; ~((<span class="number">1U</span>LL &lt;&lt; slot) - <span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<pre><code>小于msize对应的bit位设置为1
+</code></pre><ol start="2">
+<li><p>找到第一个bit不为0的bitmap的位置(slot偏移)</p>
+ <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">slot = BITMAPV_CTZ(bitmap);    <span class="comment">// __builtin_ctzl(返回从第0位开始bit为0的bit个数)</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<ol start="3">
+<li><p>通过1和2操作得到第一个大于申请msize的空闲链表偏移. 然后和上面一样判断节点有值与否，移除节点等操作</p>
+</li>
+<li><p>如果有节点，取得节点大小(上面说的大于16B的block节点中会存储该节点大小数据)，将该节点多余的block作为节点添加到对应大小的空闲链表中</p>
+ <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">msize(申请大小)</span><br><span class="line">this_msize = TINY_FREE_SIZE(ptr);     <span class="comment">// 取得该节点的block大小</span></span><br><span class="line">leftover_msize = this_msize - msize;  <span class="comment">// 多余块大小</span></span><br><span class="line">tiny_free_list_add_ptr;			<span class="comment">// 将多余块按照大小添加到对应的空闲链表</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<ol start="5">
+<li>如果该空闲链表没有节点，接着走下面流程👇</li>
+</ol>
+<h4 id="3-从最大的空闲链表-第64个-中申请"><a href="#3-从最大的空闲链表-第64个-中申请" class="headerlink" title="3. 从最大的空闲链表(第64个)中申请"></a>3. 从最大的空闲链表(第64个)中申请</h4><p>找到空闲链表数组的最后一个元素，即最大的空闲链表(节点大于等于1024B, &gt;=64 Blocks)中查看是否有节点</p>
+<ul>
+<li><p>如果有, 和上面一样，从链表中移除该节点，设置bitmap, 将该节点多余的空间作为新节点添加到对应的空闲链表中   </p>
+</li>
+<li><p>如果没有, 接着走下面流程👇   </p>
+</li>
+</ul>
+<h4 id="4-从最后一个heap-region中分配"><a href="#4-从最后一个heap-region中分配" class="headerlink" title="4. 从最后一个heap region中分配"></a>4. 从最后一个heap region中分配</h4><blockquote>
+<p>如果上述从空闲链表申请堆内存操作失败，表示之前所有的<code>heap region</code>中没有一块连续的大于等于申请大小的空间，因为之前的<code>heap region</code>的blocks要么在空闲链表中(free过的)，要么在使用中. </p>
+</blockquote>
+<p>只有最后一个<code>heap region</code>中的blocks是在空闲链表中或者在使用中，<strong>或者从未使用过</strong>    </p>
+<p>因此从最后一个<code>heap region</code>中申请堆内存    </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (tiny_mag_ptr-&gt;mag_bytes_free_at_end &gt;= TINY_BYTES_FOR_MSIZE(msize)) &#123;</span><br><span class="line">	ptr = (<span class="keyword">tiny_free_list_t</span> *)((<span class="keyword">uintptr_t</span>)TINY_REGION_END(tiny_mag_ptr-&gt;mag_last_region) - tiny_mag_ptr-&gt;mag_bytes_free_at_end);</span><br><span class="line">	tiny_mag_ptr-&gt;mag_bytes_free_at_end -= TINY_BYTES_FOR_MSIZE(msize);</span><br><span class="line">	<span class="keyword">if</span> (tiny_mag_ptr-&gt;mag_bytes_free_at_end) &#123;</span><br><span class="line">		<span class="comment">// let's add an in use block after ptr to serve as boundary</span></span><br><span class="line">		set_tiny_meta_header_in_use_1((<span class="keyword">unsigned</span> <span class="keyword">char</span> *)ptr + TINY_BYTES_FOR_MSIZE(msize));</span><br><span class="line">	&#125;</span><br><span class="line">	this_msize = msize;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">goto</span> return_tiny_alloc;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>mag_bytes_free_at_end</code>表示该<code>heap region</code>还剩余的未使用过的大小</li>
+<li><code>TINY_REGION_END(tiny_mag_ptr-&gt;mag_last_region)</code>表示该<code>heap region</code>的blocks的尾位置</li>
+</ul>
+<p>如下图   </p>
+<p><img src="\images\scalable_zone\last_heap_region.png" alt="">   </p>
+<blockquote>
+<p>绿色块表示从未使用过，是连续的. <code>mag_bytes_free_at_end</code>即表示绿色块的大小<br>蓝色表示正在使用中<br>黄色的块是使用过且<strong>free</strong>了的，在<code>free_list</code>中    </p>
+</blockquote>
+<ol>
+<li>将最前面的绿色块位置作为此次申请的heap地址</li>
+<li><code>mag_bytes_free_at_end</code>减掉此次申请的msize大小   </li>
+<li>如果该<code>heap region</code>还有block,设置刚刚申请块对应在metadata的bitmap的边界bit位为1, 作为下次申请的起始位置    </li>
+</ol>
+<p><strong>Blocks Bitmap设置如下</strong>   </p>
+<p><img src="\images\scalable_zone\blocks_bitmap.png" alt="">    </p>
+<p>其中每8个字节(64bit)表示32个blocks   </p>
+<blockquote>
+<ul>
+<li><p>前面的32bit(蓝色)表示32个block的block_header(可以理解为连续blocks起始block)<br>bit <code>···10010001 (block_header) | ···10010001 (in use)</code> 表示第1个block到第4个block一段正在使用的连续空间，同理第5个block到第7个block也是如此</p>
+</li>
+<li><p>后面32bit(绿色)中的bit表示blocks是否正在使用(1表示使用中，0表示未使用)<br>bit <code>···10010001 (block_header) | ···10000001 (in use)</code> 表示第1个block到第4个block一段正在使用的连续空间，<strong>但第5个block到第7个block表示的是free的连续空间</strong></p>
+</li>
+</ul>
+</blockquote>
+<p>对应函数   </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">set_tiny_meta_header_in_use</span><br><span class="line">set_tiny_meta_header_in_use_1(用来设置边界 <span class="keyword">or</span> msize == <span class="number">1</span>)</span><br><span class="line">set_tiny_meta_header_free</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p> 通过<code>heap region</code>的bitmap信息，在free的时候，可以知道free地址申请的内存大小</p>
+</blockquote>
+<h4 id="5-收尾工作"><a href="#5-收尾工作" class="headerlink" title="5. 收尾工作"></a>5. 收尾工作</h4><ol>
+<li>在上面的过程中，如果成功分配了空间，则记录信息</li>
+</ol>
+<ul>
+<li>设置该<code>magazine</code>的<code>mag_num_objects</code>加一，该<code>magazine</code>字节使用<code>mag_num_bytes_in_objects</code>加上msize*16</li>
+<li><p>设置当前分配的堆地址所在的<code>heap region</code>的metadata. 包括该<code>heap region</code>的字节使用<code>trailer-&gt;bytes_used</code>和bitmap设置(上面解释了)   </p>
+<p>  <strong>通过堆地址，获取该地址所在的<code>heap region</code>的地址</strong> (free时只需要地址的原因)   </p>
+</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// TINY_BLOCKS_ALIGN = 20</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> TINY_REGION_FOR_PTR(_p) ((void *)((uintptr_t)(_p) &amp; ~((1 &lt;&lt; TINY_BLOCKS_ALIGN) - 1)))</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>去掉 <code>NUM _TINY _BLOCKS * TINY _QUANTUM</code>(64520*16) 最多能占用的20个bit位. 得到region基地址   </p>
+<p>这是因为在向内核申请<code>heap region</code>时，指定了堆地址内存对齐为<code>(1&lt;&lt;20)-1</code>，顾所有的<code>heap region</code>起始地址后20个bit为0. 系统调用函数<code>mach_vm_map</code>的第4个参数为内存对齐</p>
+</blockquote>
+<ol start="2">
+<li>分配空间失败，走下面的流程👇</li>
+</ol>
+<h3 id="4-free-list-of-depot-magazine"><a href="#4-free-list-of-depot-magazine" class="headerlink" title="4. free_list of depot magazine"></a>4. free_list of depot magazine</h3><p><code>tiny_get_region_from_depot</code>函数从<code>depot magazine</code>中寻找一个能分配msize空闲链表(大于等于msize)的第一个节点所在的<code>heap region</code>, 将该<code>heap region</code>从<code>depot magazine</code>移到<code>current magazine</code></p>
+<p><strong>然后在从<code>current magazine</code>中分配(即上一步流程)</strong>   </p>
+<p>函数流程如下   </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">tiny_get_region_from_depot</span><span class="params">(...)</span> </span>&#123;</span><br><span class="line">	tiny_find_msize_region;</span><br><span class="line">	recirc_list_extract;</span><br><span class="line">	tiny_free_detach_region;</span><br><span class="line">	tiny_free_reattach_region;</span><br><span class="line">	recirc_list_splice_first;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol>
+<li><code>tiny_find_msize_region</code>函数从<code>depot magazine</code>的空闲链表数组中寻找一个大于等于申请大小msize的节点(过程同上面<code>free_lists</code>一样)，通过节点地址得到该节点的<code>heap region</code>(<code>TINY_REGION_FOR_PTR</code>函数, 上面也说过)</li>
+<li><code>recirc_list_extract</code>函数将上一步得到的<code>heap region</code>从<code>depot magazine</code>双向链表<code>region_trailer</code>中移除</li>
+<li><code>tiny_free_detach_region</code>通过遍历<code>heap region</code>blocks的bitmap，将free的blocks从<code>depot magazine</code>的空闲链表中移除</li>
+<li><code>tiny_free_reattach_region</code>通过遍历<code>heap region</code>blocks的bitmap，将free的blocks添加到<code>current magazine</code>的空闲链表中</li>
+<li><code>recirc_list_splice_first</code>将<code>heap region</code>作为节点添加到<code>current magazine</code>的双向链表<code>region_trailer</code>中   </li>
+</ol>
+<p>变化过程如下(<strong>msize=2</strong>)   </p>
+<p>变化之前</p>
+<p><img src="\images\scalable_zone\tiny_get_region_from_depot1.png" alt=""> </p>
+<p>变化之后</p>
+<p><img src="\images\scalable_zone\tiny_get_region_from_depot2.png" alt=""> </p>
+<p><strong>如果上面的<code>tiny_find_msize_region</code>失败，表示<code>depot magazine</code>空闲链表数组中也没有大于等于msize的节点. 接着走下面的流程👇</strong></p>
+<h3 id="5-mmap"><a href="#5-mmap" class="headerlink" title="5. mmap"></a>5. mmap</h3><p><code>mvm_allocate_pages_securely</code>向内核申请一块<code>heap region</code>   </p>
+<ul>
+<li>失败，<code>return nil</code></li>
+<li>成功，<code>tiny_malloc_from_region_no_lock</code>函数从刚刚申请的<code>heap region</code>中分配msize</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span>* <span class="title">tiny_malloc_from_region_no_lock</span><span class="params">(...)</span> </span>&#123;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// aligned_address = heap region地址</span></span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 1. 设置magazine最后一次向内核申请的heap地址</span></span><br><span class="line">	tiny_mag_ptr-&gt;mag_last_region = aligned_address;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 2. ASLR 随机偏移（offset_msize的blocks丢弃不使用）</span></span><br><span class="line">	<span class="meta">#<span class="meta-keyword">if</span> CONFIG_ASLR_INTERNAL</span></span><br><span class="line">		<span class="keyword">int</span> offset_msize = malloc_entropy[<span class="number">0</span>] &amp; TINY_ENTROPY_MASK</span><br><span class="line">	#<span class="keyword">else</span></span><br><span class="line">		<span class="keyword">int</span> offset_msize = <span class="number">0</span>; </span><br><span class="line">	<span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 3. 得到申请地址</span></span><br><span class="line">	ptr = aligned_address + offset_msize;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 4. 设置metadata信息</span></span><br><span class="line">	<span class="comment">/// 设置heap region的bit信息</span></span><br><span class="line">	set_tiny_meta_header_in_use(ptr, msize);  <span class="comment">// 设置使用bit</span></span><br><span class="line">	set_tiny_meta_header_in_use_1;  <span class="comment">// 设置边界bit</span></span><br><span class="line">	</span><br><span class="line">	<span class="comment">/// 设置magazine信息</span></span><br><span class="line">	mag_num_objects  </span><br><span class="line">	mag_num_bytes_in_objects</span><br><span class="line">	num_bytes_in_magazine</span><br><span class="line">	mag_bytes_free_at_end</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 5. 将heap region添加到magazine的node双向链表中</span></span><br><span class="line">	recirc_list_splice_last;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">return</span> ptr;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>至此，整个tiny_malloc的过程就分析完了，下面看看对应的free过程tiny _free吧</strong></p>
+<h2 id="tiny-free"><a href="#tiny-free" class="headerlink" title="tiny_free"></a>tiny_free</h2><p>函数<code>free()</code>通过函数<code>find_registered_zone</code>找到释放地址所在的<code>zone</code>, 再调用<code>zone</code>的<code>basic_zone</code>在zone创建时注册的<code>free</code>函数    </p>
+<p><code>s_zone</code>注册的free函数为<code>szone_free</code>，<code>szone_free</code>会通过释放地址<code>ptr</code>尝试获取<code>ptr</code>所在的<code>heap region</code>, 包括<code>tiny</code>, <code>small</code>, <code>medium</code>. 如果<code>tiny</code>(&lt;1009B)返回的<code>heap region</code>不为空, 则走<code>free_tiny</code>函数  </p>
+<p>对于<code>tiny_free</code>函数主要有3个步骤，如下</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">free_tiny</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	ptr  			<span class="comment">// 当前释放地址</span></span><br><span class="line">	msize 			<span class="comment">// 当前释放堆大小</span></span><br><span class="line">	tiny_region 	<span class="comment">// 当前释放地址所在的heap region地址</span></span><br><span class="line">	</span><br><span class="line">	·</span><br><span class="line">	·</span><br><span class="line">	·</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 1. 验证Double Free</span></span><br><span class="line">	msize = get_tiny_meta_header(ptr, &amp;is_free);   </span><br><span class="line">	<span class="keyword">if</span> (is_free) &#123;</span><br><span class="line">		free_tiny_botch(rack, ptr);    <span class="comment">// 抛出异常</span></span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 2. 设置last_free</span></span><br><span class="line">	<span class="keyword">if</span> (msize &lt; <span class="number">16</span>) &#123;</span><br><span class="line">		<span class="keyword">void</span> *ptr2 = tiny_mag_ptr-&gt;mag_last_free;  <span class="comment">// Might be NULL</span></span><br><span class="line">		<span class="keyword">msize_t</span> msize2 = tiny_mag_ptr-&gt;mag_last_free_msize;</span><br><span class="line">		<span class="keyword">region_t</span> rgn2 = tiny_mag_ptr-&gt;mag_last_free_rgn;</span><br><span class="line">		</span><br><span class="line">		tiny_mag_ptr-&gt;mag_last_free = ptr;</span><br><span class="line">		tiny_mag_ptr-&gt;mag_last_free_msize = msize;</span><br><span class="line">		tiny_mag_ptr-&gt;mag_last_free_rgn = tiny_region;</span><br><span class="line">		</span><br><span class="line">		msize = msize2;</span><br><span class="line">		ptr = ptr2;</span><br><span class="line">		tiny_region = rgn2;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 3. 释放last_free</span></span><br><span class="line">	tiny_free_no_lock(..., tiny_region, ptr, msize);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<ol>
+<li>根据<code>heap region</code>的metadata的bitmap，验证ptr是否是free过的(In Use对应的bit位为0)</li>
+<li>设置free_cache, 如果释放内存小于16个msize,则此次释放地址设置成<code>last_free</code>, 然后对上一次的<code>last_free</code>操作</li>
+<li>释放<code>last_free</code></li>
+</ol>
+</blockquote>
+<p>真正free堆内存在<code>tiny_free_no_lock</code>函数中</p>
+<h3 id="tiny-free-no-lock"><a href="#tiny-free-no-lock" class="headerlink" title="tiny_ free_ no_lock"></a>tiny_ free_ no_lock</h3><p>正常只需要将释放地址作为节点添加到对应大小的空闲链表中，然后设置地址块对应的bitmap信息就行了.</p>
+<p>但是在<code>libmalloc</code>的<code>free</code>中有个<strong>合并过程</strong>   </p>
+<p><code>tiny_ free_ no_lock</code>函数如下</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">tiny_free_no_lock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="comment">// 1. 向前合并</span></span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 2. 向后合并</span></span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 3. 更新bitmap信息，将合并结果添加到对应大小的空闲链表中；更新magazine的信息数据</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="向前合并-上一个block"><a href="#向前合并-上一个block" class="headerlink" title="向前合并(上一个block)"></a>向前合并(上一个block)</h4><p>对于大于16字节空闲链表的节点，前面16字节存储前驱和后继指针，指针后两个字节存储块大小msize, 最后两个字节也储存着块大小msize. 对应函数<code>TINY_FREE_SIZE</code></p>
+<p><strong>合并前如下图</strong></p>
+<p><img src="\images\scalable_zone\pre_coalesce1.png" alt="">   </p>
+<blockquote>
+<p>图中红色表示当前释放的内存, 绿色表示在空闲链表的内存</p>
+</blockquote>
+<p><strong>合并后如下图</strong>    </p>
+<p><img src="\images\scalable_zone\pre_coalesce2.png" alt="">  </p>
+<blockquote>
+<p>此时还没加入到空闲链表中，待下面向后合并步骤完成，才加入到空闲链表中</p>
+</blockquote>
+<p>合并过程如下</p>
+<ol>
+<li><p><code>block_header</code>:<br> 判断当前<code>free ptr</code>地址的前一个block是否是<code>block_header</code></p>
+<blockquote>
+<p>根据bitmap判断，即图中100前一个bit是否为1 </p>
+<p>如果是1则<code>free ptr</code>前1个block为单独的连续的空间，即为<code>block_header</code><br>  如果不是1, 则表示<code>free ptr</code>前n个block为单独的连续的空间<code>previous</code>(如图所示)</p>
+</blockquote>
+</li>
+<li><p><code>pre_size</code>:<br> 如果前一个block是block_ header，那么连续空间<code>previous</code>大小<code>pre_size</code>等于1    </p>
+<pre><code>如果不是block_header，表示连续空间`previous`大小大于1 
+</code></pre><blockquote>
+<p>对于大于1的blocks, 如果该连续空间在空闲链表中，该空间的最后两个字节储存着该区域所占用的block大小(如图<code>pre_size</code>=2) </p>
+<p>如果该空间不在空闲链表中(不需要合并)，也暂时先读最后两个字节作为<code>pre_size</code>，之后再通过bitmap的<code>block_header==1</code>进行验证   </p>
+</blockquote>
+</li>
+</ol>
+<ol start="3">
+<li><p><code>验证</code>:<br> 根据上一步获取到的<code>pre_size</code>，将<code>free_ptr</code>对应的bit位向前移动<code>pre_size</code>, 得到<code>previous</code>的起始位置对应的bit. 当该bit位的<code>block_header</code>=1, <code>In Use</code>=0 表示该连续区间在空闲链表中需要合并(如上图所示) </p>
+<blockquote>
+<p>但如果<code>···1010100···(block_header)  ···0010100···(in use)</code>这种情况. <code>100</code>还是要释放的内存, 前面的<code>10</code>内存块为使用中，这时候如果该内存块最后两个字节为4. 那么在合并中就会取<code>100</code>的前面4个块作为一个连续的区间，对应bit为<code>1010(block_header) 0010(in use)</code> ，此时验证也是正确的. 那么使用中的<code>10</code>两个内存block就会被合并</p>
+</blockquote>
+<p> <strong>解决</strong>: 验证该连续区域大小</p>
+<blockquote>
+<p>从<code>1010(block_header) 0010(in use)</code>内存起始位置计算得到的大小为2，与4不符合. 验证失败 （空闲链表节点的前驱后继指针之后(16字节之后)存储着块大小msize）</p>
+</blockquote>
+</li>
+<li><p><code>合并</code>:</p>
+<p> 如果<code>free ptr</code>前面的连续空间<code>previous</code>在空闲链表中，将<code>free ptr</code>和<code>previous</code>进行合并    </p>
+<blockquote>
+<ol>
+<li>先将<code>previous</code>从当前空闲链表中移除   </li>
+<li>清除<code>free ptr</code>内存区域对应的bitmap信息</li>
+<li><code>free ptr</code>和<code>previous</code>大小和作为新free大小</li>
+<li><code>free ptr</code> = <code>previous</code> </li>
+</ol>
+</blockquote>
+</li>
+</ol>
+<h4 id="向后合并-下一个block"><a href="#向后合并-下一个block" class="headerlink" title="向后合并(下一个block)"></a>向后合并(下一个block)</h4><p>对于大于16字节空闲链表的节点，前面16字节存储前驱和后继指针，指针后两个字节存储块大小msize</p>
+<p><strong>合并前如下图</strong></p>
+<p><img src="\images\scalable_zone\next_coalesce1.png" alt="">   </p>
+<p><strong>合并后如下图</strong>    </p>
+<p><img src="\images\scalable_zone\next_coalesce2.png" alt="">  </p>
+<blockquote>
+<p>合并过程和上面类似</p>
+</blockquote>
+<h4 id="合并结束"><a href="#合并结束" class="headerlink" title="合并结束"></a>合并结束</h4><p>合并结束后更新合并内存块对应的bitmap信息，将合并的内存块添加到对应的空闲链表中<br>更新<code>magazine</code>数据，更新当前<code>heap region</code>的metadata信息</p>
+<p><strong>至此，整个<code>tiny_free</code>过程结束</strong></p>
+<hr>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/12/16/iOS内存-堆-libmalloc-简介/" rel="next" title="iOS内存-堆(libmalloc)-简介">
+                <i class="fa fa-chevron-left"></i> iOS内存-堆(libmalloc)-简介
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/12/16/iOS内存-堆-libmalloc-nano-zone/" rel="prev" title="iOS内存-堆(libmalloc)-nano_zone">
+                iOS内存-堆(libmalloc)-nano_zone <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="Tanner Jin" />
+            
+              <p class="site-author-name" itemprop="name">Tanner Jin</p>
+              <p class="site-description motion-element" itemprop="description">尘世间一迷途小码农</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">24</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/TannerJin" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/p/1005055237152442/home?from=page_100505&mod=TAB&is_hot=1#place" target="_blank" title="Weibo">
+                      
+                        <i class="fa fa-fw fa-Weibo"></i>Weibo</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#SZone"><span class="nav-number">1.</span> <span class="nav-text">SZone</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Rack"><span class="nav-number">2.</span> <span class="nav-text">Rack</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Magazine"><span class="nav-number">3.</span> <span class="nav-text">Magazine</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Heap-Region"><span class="nav-number">3.1.</span> <span class="nav-text">Heap Region</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#设计"><span class="nav-number">3.1.1.</span> <span class="nav-text">设计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#和magazine的关系"><span class="nav-number">3.1.2.</span> <span class="nav-text">和magazine的关系</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Last-Free"><span class="nav-number">3.2.</span> <span class="nav-text">Last_Free</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Free-Lists"><span class="nav-number">3.3.</span> <span class="nav-text">Free_Lists</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SZone架构总结"><span class="nav-number">4.</span> <span class="nav-text">SZone架构总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Malloc-and-Free"><span class="nav-number">5.</span> <span class="nav-text">Malloc and Free</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#tiny-malloc"><span class="nav-number">5.1.</span> <span class="nav-text">tiny_malloc</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-current-magazine"><span class="nav-number">5.1.1.</span> <span class="nav-text">1. current magazine</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-last-free"><span class="nav-number">5.1.2.</span> <span class="nav-text">2. last_free</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-free-list-of-curretn-magazine-重点"><span class="nav-number">5.1.3.</span> <span class="nav-text">3. free_list of curretn magazine(重点)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-从空闲链表数组中找到大小匹配的空闲链表"><span class="nav-number">5.1.3.1.</span> <span class="nav-text">1. 从空闲链表数组中找到大小匹配的空闲链表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-从第一个大于申请msize的空闲链表申请"><span class="nav-number">5.1.3.2.</span> <span class="nav-text">2. 从第一个大于申请msize的空闲链表申请</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-从最大的空闲链表-第64个-中申请"><span class="nav-number">5.1.3.3.</span> <span class="nav-text">3. 从最大的空闲链表(第64个)中申请</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-从最后一个heap-region中分配"><span class="nav-number">5.1.3.4.</span> <span class="nav-text">4. 从最后一个heap region中分配</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-收尾工作"><span class="nav-number">5.1.3.5.</span> <span class="nav-text">5. 收尾工作</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-free-list-of-depot-magazine"><span class="nav-number">5.1.4.</span> <span class="nav-text">4. free_list of depot magazine</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-mmap"><span class="nav-number">5.1.5.</span> <span class="nav-text">5. mmap</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tiny-free"><span class="nav-number">5.2.</span> <span class="nav-text">tiny_free</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#tiny-free-no-lock"><span class="nav-number">5.2.1.</span> <span class="nav-text">tiny_ free_ no_lock</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#向前合并-上一个block"><span class="nav-number">5.2.1.1.</span> <span class="nav-text">向前合并(上一个block)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#向后合并-下一个block"><span class="nav-number">5.2.1.2.</span> <span class="nav-text">向后合并(下一个block)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#合并结束"><span class="nav-number">5.2.1.3.</span> <span class="nav-text">合并结束</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tanner Jin</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

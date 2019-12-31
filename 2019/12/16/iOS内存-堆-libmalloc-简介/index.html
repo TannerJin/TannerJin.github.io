@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="堆进程的虚拟内存是由多个内存区域组成的，不同的内存区域拥有不同的权限(r/w/e)进程中每个内存区域的分配，释放都得经过内核系统调用(内核需要记录内存区域的信息，以及和物理内存的映射关系)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS内存-堆(libmalloc)-简介">
+<meta property="og:url" content="http://yoursite.com/2019/12/16/iOS内存-堆-libmalloc-简介/index.html">
+<meta property="og:site_name" content="Tanner Jin">
+<meta property="og:description" content="堆进程的虚拟内存是由多个内存区域组成的，不同的内存区域拥有不同的权限(r/w/e)进程中每个内存区域的分配，释放都得经过内核系统调用(内核需要记录内存区域的信息，以及和物理内存的映射关系)">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/images/libmalloc/malloc_zones.png">
+<meta property="og:image" content="http://yoursite.com/images/libmalloc/malloc_zones2.png">
+<meta property="og:image" content="http://yoursite.com/images/libmalloc/malloc_zone_t.png">
+<meta property="og:image" content="http://yoursite.com/images/libmalloc/zone.png">
+<meta property="og:image" content="http://yoursite.com/images/libmalloc/default_zone.png">
+<meta property="og:updated_time" content="2019-12-19T09:09:30.507Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iOS内存-堆(libmalloc)-简介">
+<meta name="twitter:description" content="堆进程的虚拟内存是由多个内存区域组成的，不同的内存区域拥有不同的权限(r/w/e)进程中每个内存区域的分配，释放都得经过内核系统调用(内核需要记录内存区域的信息，以及和物理内存的映射关系)">
+<meta name="twitter:image" content="http://yoursite.com/images/libmalloc/malloc_zones.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/12/16/iOS内存-堆-libmalloc-简介/"/>
+
+
+
+
+
+  <title>iOS内存-堆(libmalloc)-简介 | Tanner Jin</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Tanner Jin</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/12/16/iOS内存-堆-libmalloc-简介/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Tanner Jin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tanner Jin">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">iOS内存-堆(libmalloc)-简介</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-16T17:41:55+08:00">
+                2019-12-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/内存/" itemprop="url" rel="index">
+                    <span itemprop="name">内存</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="堆"><a href="#堆" class="headerlink" title="堆"></a>堆</h1><p>进程的虚拟内存是由多个内存区域组成的，不同的内存区域拥有不同的权限(r/w/e)<br>进程中每个内存区域的分配，释放都得经过内核系统调用(内核需要记录内存区域的信息，以及和物理内存的映射关系)    </p>
+<a id="more"></a>  
+<p><strong>全局变量</strong> 内存的分配发生在编译(决定大小)和装载期。编译器将全局变量放到数据区，在dyld装载时，通过系统调用(mmap/vm_map)给该全局变量所在的数据区分配内存后，该变量也就分配了空间。除非通过系统调用将该数据区的内存注销，或者进程结束，否则该变量永远不会释放 </p>
+<p><strong>栈</strong> 内存的分配发生在运行期，但是无法保存变量，在函数调用完后，出栈，变量也就“释放”了    </p>
+<p><strong>堆</strong> 如果要变量内存分配发生在运行期，并且是持久，可以利用系统调用分配和堆内存管理  </p>
+<p>如果每次分配一个小内存都走系统调用分配，不仅效率慢(cpu执行状态切换以及内核代码过多的安全检查逻辑)，而且会给内核内存带来压力(每向内核申请一块内存区域，内核会生成vm_objcet对象描述该区域信息)<br>并且内核申请的最小单位是页(4096个字节)</p>
+<p>堆内存是通过系统调用分配许多大的内存区域，然后在用户态对这些内存区域进行管理 </p>
+<h1 id="libmalloc"><a href="#libmalloc" class="headerlink" title="libmalloc"></a>libmalloc</h1><p>apple平台的堆内存libmalloc设计是空闲链表和位图结合   </p>
+<p><strong>位图</strong>  libmalloc会将操作系统分配到的heap内存区域分为一个一个块(block)处理，每个块16字节(两个指针的大小)，当请求malloc的size小于等于16字节时，分配1个block. 大于16小于等于32时，分配2个block. 以此类推(细节操作见后面几篇的堆内存，如描述块的medata bit设置等)</p>
+<p><strong>空闲链表</strong> libmalloc会将free的内存块添加到free_list中，由于堆内存最小单位是block(16 字节)，因此释放的内存能够储存pre和next指针信息 (细节操作见后面几篇的堆内存, 如空闲块的合并等)   </p>
+<h2 id="Zone"><a href="#Zone" class="headerlink" title="Zone"></a>Zone</h2><p>libmalloc 通过Zone对象对堆内存区域通过位图和空闲链表进行集中管理<br>libmalloc中有两种类型的Zone, <strong>scalable _zone</strong>和<strong>nano _zone</strong> (nano _zone有两个版本, nano _zone和nanov2 _zone)      </p>
+<p>nano_zone不常用，只有在进程环境变量MallocNanoZone为1情况下，才会开启<br>nano _zone只能分配小于256字节的内存，如果大于256, 会通过nano _zone的属性helper _zone分配，而helper _zone是一个scalable _zone   </p>
+<p><strong>后面文章主要对这三种Zone进行分析，解析用户态堆设计, 即Zone是如何管理向内核申请的Heap Memory Region的</strong> </p>
+<h3 id="malloc-zones"><a href="#malloc-zones" class="headerlink" title="malloc_zones"></a>malloc_zones</h3><p><strong>malloc _zones</strong>是libmalloc的一个全局变量指针，指向一个zone指针数组，Zone对象通过系统调用(mach_ vm_ map)申请内存，申请后的Zone对象指针存放在zone指针数组中<br>zone指针数组通过系统调用mach_ vm _allocate申请内存空间  </p>
+<p>具体如下图</p>
+<p><img src="\images\libmalloc\malloc_zones.png" alt=""></p>
+<p>当添加一个Zone对象后，会通过mach_ vm _allocate重新申请一块内存区域，用来存放zone指针，将之前zone指针数组内存数据的copy到该新区域，并在后面加上新Zone对象的地址，之前的zone指针数组内存释放   </p>
+<p>变化如下<br><img src="\images\libmalloc\malloc_zones2.png" alt="">   </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* </span></span><br><span class="line"><span class="comment">    添加一个zone*到malloc_zones</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">malloc_zone_register_while_locked   </span><br><span class="line"></span><br><span class="line"><span class="comment">/* </span></span><br><span class="line"><span class="comment">   第一个zone的通过懒加载初始化的</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">_malloc_initialize_once</span><br><span class="line">_malloc_initialize</span><br></pre></td></tr></table></figure>
+<h3 id="malloc-zone-t"><a href="#malloc-zone-t" class="headerlink" title="malloc_zone _t"></a>malloc_zone _t</h3><p>scalable _zone和nano _zone的第一个元素是malloc _zone _t，储存着malloc, free<br>calloc, valloc函数指针，即不同类型的zone, 在creat后设置不同的malloc函数处理。zone的malloc _zone _t设置后，会将当前页设置为只读   </p>
+<p>malloc _zone _t结构如下<br><img src="\images\libmalloc\malloc_zone_t.png" alt=""></p>
+<p>zone结构如下<br><img src="\images\libmalloc\zone.png" alt="">   </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">zone</span> &#123;</span></span><br><span class="line">	<span class="keyword">malloc_zone_t</span> basic_zone;</span><br><span class="line">	<span class="keyword">uint8_t</span> pad[PAGE_MAX_SIZE - <span class="keyword">sizeof</span>(<span class="keyword">malloc_zone_t</span>)];</span><br><span class="line">	·</span><br><span class="line">	·</span><br><span class="line">	·</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="default-zone"><a href="#default-zone" class="headerlink" title="default_zone"></a>default_zone</h3><p>malloc 函数具体调用<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">malloc_zone_malloc(malloc_zone_t *zone, size_t size)</span><br></pre></td></tr></table></figure></p>
+<p>申请内存，参数zone是全局变量<strong>default _zone</strong>, 这个default _zone是scalable _zone类型，主要存放着函数指针信息。这个default _zone的malloc函数不会参与具体的内存分配，而是找到上面说到的全局变量<strong>malloc _zones</strong>的第一个zone，通过该zone属性malloc_zone _t中的malloc函数指针进行具体的malloc内存。free同理     </p>
+<p>过程如下图<br><img src="\images\libmalloc\default_zone.png" alt=""></p>
+<h2 id="后续…"><a href="#后续…" class="headerlink" title="后续…"></a>后续…</h2><p>以上是libmalloc简单的介绍以及最外层的大致结构，至于核心操作和实现都在scalable和nano的zone中</p>
+<p>后面几篇就讲述<strong>scalable _zone</strong>和<strong>nano _zone</strong>是怎么工作的</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/12/16/iOS内存-栈/" rel="next" title="iOS内存-栈">
+                <i class="fa fa-chevron-left"></i> iOS内存-栈
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/12/16/iOS内存-堆-libmalloc-magazine-zone/" rel="prev" title="iOS内存-堆(libmalloc)-scalable_zone">
+                iOS内存-堆(libmalloc)-scalable_zone <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="Tanner Jin" />
+            
+              <p class="site-author-name" itemprop="name">Tanner Jin</p>
+              <p class="site-description motion-element" itemprop="description">尘世间一迷途小码农</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">24</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/TannerJin" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/p/1005055237152442/home?from=page_100505&mod=TAB&is_hot=1#place" target="_blank" title="Weibo">
+                      
+                        <i class="fa fa-fw fa-Weibo"></i>Weibo</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#堆"><span class="nav-number">1.</span> <span class="nav-text">堆</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#libmalloc"><span class="nav-number">2.</span> <span class="nav-text">libmalloc</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Zone"><span class="nav-number">2.1.</span> <span class="nav-text">Zone</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#malloc-zones"><span class="nav-number">2.1.1.</span> <span class="nav-text">malloc_zones</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#malloc-zone-t"><span class="nav-number">2.1.2.</span> <span class="nav-text">malloc_zone _t</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#default-zone"><span class="nav-number">2.1.3.</span> <span class="nav-text">default_zone</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后续…"><span class="nav-number">2.2.</span> <span class="nav-text">后续…</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tanner Jin</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
