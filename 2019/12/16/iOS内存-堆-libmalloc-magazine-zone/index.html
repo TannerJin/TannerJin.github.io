@@ -100,7 +100,7 @@
 <meta property="og:image" content="http://yoursite.com/images/scalable_zone/pre_coalesce2.png">
 <meta property="og:image" content="http://yoursite.com/images/scalable_zone/next_coalesce1.png">
 <meta property="og:image" content="http://yoursite.com/images/scalable_zone/next_coalesce2.png">
-<meta property="og:updated_time" content="2019-12-31T09:15:48.140Z">
+<meta property="og:updated_time" content="2020-01-02T16:50:37.975Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iOS内存-堆(libmalloc)-scalable_zone">
 <meta name="twitter:description" content="scalable_zone是zone其中一种类型, 分配堆内存管理者，malloc，free等函数真正的入口">
@@ -426,9 +426,9 @@
 </blockquote>
 <p><img src="\images\scalable_zone\s_zone&amp;heap_region.png" alt="">   </p>
 <h2 id="Last-Free"><a href="#Last-Free" class="headerlink" title="Last_Free"></a>Last_Free</h2><p><code>magazine</code>的<code>last_free等属性</code>储存着该<code>magazine</code>最后一次free的block块地址，块大小，以及块地址的<code>heap region</code>地址</p>
-<h2 id="Free-Lists"><a href="#Free-Lists" class="headerlink" title="Free_Lists"></a>Free_Lists</h2><p><code>free_lists</code>是<code>magazine</code>的空闲链表数组，空闲链表数组的元素按照块大小递增   </p>
+<h2 id="Free-Lists"><a href="#Free-Lists" class="headerlink" title="Free_Lists"></a>Free_Lists</h2><p><code>free</code>过的内存会作为节点储存在空闲链表中，而<code>free_lists</code>是<code>magazine</code>的空闲链表数组，数组元素空闲链表按照内存块大小递增   </p>
 <blockquote>
-<p>对于<strong>tiny_rack</strong>最多分配1008个字节，因此该rack下的每个magazine的空闲链表数组个数最大为1008/16 + 1 = 64，即第1个空闲链表的节点内存大小为1block(=16B), 第2个空闲链表的节点内存大小为2blocks(=32B)…第63个空闲链表的节点内存为63blocks(=1008B), <strong>最后一个第64个空闲链表的节点内存大于等于64blocks(&gt;=1024B，该链表节点是free时合并产生)</strong>    </p>
+<p>对于<strong>tiny_rack</strong>最多分配1008个字节，因此该rack下的每个magazine的空闲链表数组个数最大为1008/16 + 1 = 64，即第1个空闲链表的每个节点内存大小为1block(=16B), 第2个空闲链表的每个节点内存大小为2blocks(=32B)…第63个空闲链表的每个节点内存为63blocks(=1008B), <strong>但最后一个第64个空闲链表的每个节点内存大于等于64blocks(&gt;=1024B，该链表节点是free时合并产生)</strong>    </p>
 </blockquote>
 <p>magazine中的空闲链表数组结构如下   </p>
 <p><img src="\images\scalable_zone\free_lists.png" alt="">   </p>
@@ -447,7 +447,7 @@
 <h1 id="Malloc-and-Free"><a href="#Malloc-and-Free" class="headerlink" title="Malloc and Free"></a>Malloc and Free</h1><h2 id="tiny-malloc"><a href="#tiny-malloc" class="headerlink" title="tiny_malloc"></a>tiny_malloc</h2><p><code>tiny_malloc_should_clear</code> 是整个分配流程, 在函数<code>szone_malloc_should_clear</code>中通过判断申请的内存大小调用的，当申请大小小于1009个字节时调用   </p>
 <p> <strong>msize</strong>   </p>
 <blockquote>
-<p>msize表示block申请大小单位，1表示申请1个block，16字节。当申请大小不满16B，也分配1个block，申请大于一个小于两个block，分配2个block, 以此类推… </p>
+<p>msize表示block申请大小单位，1表示申请1个block，16字节。当申请大小不满16B，分配1个block，申请大于16B小于等于32B，分配2个block, 以此类推… </p>
 </blockquote>
 <blockquote>
 <p>具体实现: msize = (size+15) &gt;&gt; 4 即 msize = (size+15)/16   </p>
@@ -905,7 +905,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
