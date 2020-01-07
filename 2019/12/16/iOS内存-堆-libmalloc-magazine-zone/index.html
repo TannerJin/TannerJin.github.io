@@ -100,7 +100,7 @@
 <meta property="og:image" content="http://yoursite.com/images/scalable_zone/pre_coalesce2.png">
 <meta property="og:image" content="http://yoursite.com/images/scalable_zone/next_coalesce1.png">
 <meta property="og:image" content="http://yoursite.com/images/scalable_zone/next_coalesce2.png">
-<meta property="og:updated_time" content="2020-01-02T16:50:37.975Z">
+<meta property="og:updated_time" content="2020-01-07T22:22:02.333Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iOS内存-堆(libmalloc)-scalable_zone">
 <meta name="twitter:description" content="scalable_zone是zone其中一种类型, 分配堆内存管理者，malloc，free等函数真正的入口">
@@ -643,7 +643,7 @@
 </blockquote>
 <p>真正free堆内存在<code>tiny_free_no_lock</code>函数中</p>
 <h3 id="tiny-free-no-lock"><a href="#tiny-free-no-lock" class="headerlink" title="tiny_ free_ no_lock"></a>tiny_ free_ no_lock</h3><p>正常只需要将释放地址作为节点添加到对应大小的空闲链表中，然后设置地址块对应的bitmap信息就行了.</p>
-<p>但是在<code>libmalloc</code>的<code>free</code>中有个<strong>合并过程</strong>   </p>
+<p>但是在<code>libmalloc</code>的<code>free</code>中有个<strong>合并过程，合并为了整理内存碎片，为了之后分配更大的内存提供可能</strong>   </p>
 <p><code>tiny_ free_ no_lock</code>函数如下</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">tiny_free_no_lock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="comment">// 1. 向前合并</span></span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 2. 向后合并</span></span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 3. 更新bitmap信息，将合并结果添加到对应大小的空闲链表中；更新magazine的信息数据</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h4 id="向前合并-上一个block"><a href="#向前合并-上一个block" class="headerlink" title="向前合并(上一个block)"></a>向前合并(上一个block)</h4><p>对于大于16字节空闲链表的节点，前面16字节存储前驱和后继指针，指针后两个字节存储块大小msize, 最后两个字节也储存着块大小msize. 对应函数<code>TINY_FREE_SIZE</code></p>
@@ -706,6 +706,53 @@
 <h4 id="合并结束"><a href="#合并结束" class="headerlink" title="合并结束"></a>合并结束</h4><p>合并结束后更新合并内存块对应的bitmap信息，将合并的内存块添加到对应的空闲链表中<br>更新<code>magazine</code>数据，更新当前<code>heap region</code>的metadata信息</p>
 <p><strong>至此，整个<code>tiny_free</code>过程结束</strong></p>
 <hr>
+<h1 id="总结思考"><a href="#总结思考" class="headerlink" title="总结思考"></a>总结思考</h1><p><code>libmalloc</code>确实是一个优秀的用户堆管理库. 里面有许多优秀的分配策略设计, 并发的支持设计，内存碎片管理，性能考虑等等. 之前看有些书说过的堆设计的问题，它都有对应的解决策略    </p>
+<ol>
+<li><p>多核并发性设计</p>
+<blockquote>
+<p>采用一核对应一个堆管理<code>magazine</code>，让该核下的虚拟并发性能更好</p>
+</blockquote>
+</li>
+<li><p>堆管理最小单位 </p>
+<blockquote>
+<p>将堆内存划分为多个相同大小的<code>block</code>, 即堆中的最小单位, 16B, 更利于空闲链表管理</p>
+</blockquote>
+</li>
+<li><p>采用空闲链表数组</p>
+<blockquote>
+<p>将不同大小的<code>free</code>了的堆空间组成不同空闲链表形成一个空闲链表数组，加快分配效率，更易于管理</p>
+</blockquote>
+</li>
+<li><p>多级分配策略</p>
+<blockquote>
+<ul>
+<li><code>last free</code>属性缓存;   </li>
+<li>空闲链表匹配;   </li>
+<li>寻找更大的空闲链表(分割处理多余的空间);   //  对应bit优化算法找到空闲链表</li>
+<li>最后一个可利用的堆</li>
+<li>仓库<code>depot magazine</code></li>
+<li>内核</li>
+</ul>
+</blockquote>
+</li>
+<li><p>bitmap记录<code>block</code>信息</p>
+<blockquote>
+<p>使用64bit表示32个<code>blocks</code>信息; <code>Block Header</code> and <code>In Use</code></p>
+</blockquote>
+</li>
+<li><p>系统调用返回对齐的<code>heap region</code></p>
+<blockquote>
+<p>对齐20bit, 一个<code>heap region</code>中blocks能占用的空间，通过堆内存中的地址去掉后20bit可以获得该<code>heap region</code>的基地址</p>
+</blockquote>
+</li>
+<li><p>合并。碎片内存整理    </p>
+<blockquote>
+<p><code>free</code>过程中，整理前后内存碎片. 将碎片内存合并在一起，利用分配更大的堆内存</p>
+</blockquote>
+</li>
+<li><p>等等</p>
+</li>
+</ol>
 
       
     </div>
@@ -885,7 +932,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#SZone"><span class="nav-number">1.</span> <span class="nav-text">SZone</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Rack"><span class="nav-number">2.</span> <span class="nav-text">Rack</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Magazine"><span class="nav-number">3.</span> <span class="nav-text">Magazine</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Heap-Region"><span class="nav-number">3.1.</span> <span class="nav-text">Heap Region</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#设计"><span class="nav-number">3.1.1.</span> <span class="nav-text">设计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#和magazine的关系"><span class="nav-number">3.1.2.</span> <span class="nav-text">和magazine的关系</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Last-Free"><span class="nav-number">3.2.</span> <span class="nav-text">Last_Free</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Free-Lists"><span class="nav-number">3.3.</span> <span class="nav-text">Free_Lists</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SZone架构总结"><span class="nav-number">4.</span> <span class="nav-text">SZone架构总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Malloc-and-Free"><span class="nav-number">5.</span> <span class="nav-text">Malloc and Free</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#tiny-malloc"><span class="nav-number">5.1.</span> <span class="nav-text">tiny_malloc</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-current-magazine"><span class="nav-number">5.1.1.</span> <span class="nav-text">1. current magazine</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-last-free"><span class="nav-number">5.1.2.</span> <span class="nav-text">2. last_free</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-free-list-of-curretn-magazine-重点"><span class="nav-number">5.1.3.</span> <span class="nav-text">3. free_list of curretn magazine(重点)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-从空闲链表数组中找到大小匹配的空闲链表"><span class="nav-number">5.1.3.1.</span> <span class="nav-text">1. 从空闲链表数组中找到大小匹配的空闲链表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-从第一个大于申请msize的空闲链表申请"><span class="nav-number">5.1.3.2.</span> <span class="nav-text">2. 从第一个大于申请msize的空闲链表申请</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-从最大的空闲链表-第64个-中申请"><span class="nav-number">5.1.3.3.</span> <span class="nav-text">3. 从最大的空闲链表(第64个)中申请</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-从最后一个heap-region中分配"><span class="nav-number">5.1.3.4.</span> <span class="nav-text">4. 从最后一个heap region中分配</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-收尾工作"><span class="nav-number">5.1.3.5.</span> <span class="nav-text">5. 收尾工作</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-free-list-of-depot-magazine"><span class="nav-number">5.1.4.</span> <span class="nav-text">4. free_list of depot magazine</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-mmap"><span class="nav-number">5.1.5.</span> <span class="nav-text">5. mmap</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tiny-free"><span class="nav-number">5.2.</span> <span class="nav-text">tiny_free</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#tiny-free-no-lock"><span class="nav-number">5.2.1.</span> <span class="nav-text">tiny_ free_ no_lock</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#向前合并-上一个block"><span class="nav-number">5.2.1.1.</span> <span class="nav-text">向前合并(上一个block)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#向后合并-下一个block"><span class="nav-number">5.2.1.2.</span> <span class="nav-text">向后合并(下一个block)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#合并结束"><span class="nav-number">5.2.1.3.</span> <span class="nav-text">合并结束</span></a></li></ol></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#SZone"><span class="nav-number">1.</span> <span class="nav-text">SZone</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Rack"><span class="nav-number">2.</span> <span class="nav-text">Rack</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Magazine"><span class="nav-number">3.</span> <span class="nav-text">Magazine</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Heap-Region"><span class="nav-number">3.1.</span> <span class="nav-text">Heap Region</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#设计"><span class="nav-number">3.1.1.</span> <span class="nav-text">设计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#和magazine的关系"><span class="nav-number">3.1.2.</span> <span class="nav-text">和magazine的关系</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Last-Free"><span class="nav-number">3.2.</span> <span class="nav-text">Last_Free</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Free-Lists"><span class="nav-number">3.3.</span> <span class="nav-text">Free_Lists</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SZone架构总结"><span class="nav-number">4.</span> <span class="nav-text">SZone架构总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Malloc-and-Free"><span class="nav-number">5.</span> <span class="nav-text">Malloc and Free</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#tiny-malloc"><span class="nav-number">5.1.</span> <span class="nav-text">tiny_malloc</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-current-magazine"><span class="nav-number">5.1.1.</span> <span class="nav-text">1. current magazine</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-last-free"><span class="nav-number">5.1.2.</span> <span class="nav-text">2. last_free</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-free-list-of-curretn-magazine-重点"><span class="nav-number">5.1.3.</span> <span class="nav-text">3. free_list of curretn magazine(重点)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-从空闲链表数组中找到大小匹配的空闲链表"><span class="nav-number">5.1.3.1.</span> <span class="nav-text">1. 从空闲链表数组中找到大小匹配的空闲链表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-从第一个大于申请msize的空闲链表申请"><span class="nav-number">5.1.3.2.</span> <span class="nav-text">2. 从第一个大于申请msize的空闲链表申请</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-从最大的空闲链表-第64个-中申请"><span class="nav-number">5.1.3.3.</span> <span class="nav-text">3. 从最大的空闲链表(第64个)中申请</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-从最后一个heap-region中分配"><span class="nav-number">5.1.3.4.</span> <span class="nav-text">4. 从最后一个heap region中分配</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-收尾工作"><span class="nav-number">5.1.3.5.</span> <span class="nav-text">5. 收尾工作</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-free-list-of-depot-magazine"><span class="nav-number">5.1.4.</span> <span class="nav-text">4. free_list of depot magazine</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-mmap"><span class="nav-number">5.1.5.</span> <span class="nav-text">5. mmap</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tiny-free"><span class="nav-number">5.2.</span> <span class="nav-text">tiny_free</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#tiny-free-no-lock"><span class="nav-number">5.2.1.</span> <span class="nav-text">tiny_ free_ no_lock</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#向前合并-上一个block"><span class="nav-number">5.2.1.1.</span> <span class="nav-text">向前合并(上一个block)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#向后合并-下一个block"><span class="nav-number">5.2.1.2.</span> <span class="nav-text">向后合并(下一个block)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#合并结束"><span class="nav-number">5.2.1.3.</span> <span class="nav-text">合并结束</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结思考"><span class="nav-number">6.</span> <span class="nav-text">总结思考</span></a></li></ol></div>
             
 
           </div>
